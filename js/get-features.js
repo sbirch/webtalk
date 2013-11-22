@@ -10,6 +10,7 @@ var TYPEABLE_TAGS = ["INPUT"];
 
 var ALL_TAGS = CLICKABLE_TAGS.concat(TYPEABLE_TAGS);
 
+
 // Compute the edit distance between the two given strings
 // Taken from: http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#JavaScript
 function getEditDistance(a, b){
@@ -44,8 +45,7 @@ function getEditDistance(a, b){
   }
  
   return matrix[b.length][a.length];
-}
-
+};
 
 function filter_word_list(a_word_list) {
     var result = []
@@ -84,11 +84,9 @@ function minEditDistanceForWord(word, word_set) {
 	return minDist;
 }
 
-
-
 var Features = {
   // Returns true if the given element is visible or else false
-  // Taken from: ????!!?!?
+  // Adapted from https://www.altamiracorp.com/blog/employee-posts/selenium-mojo-a-faster-isvisib
   // TODO: match behavior of this code with W3C spec (or else make approximations clear)
   // http://www.w3.org/TR/webdriver/#determining-visibility
   isVisible: function(element) {
@@ -98,11 +96,16 @@ var Features = {
       return false;
     }
 
+    // if 0 x 0 return false
+    if (element.clientWidth === 0 || element.clientHeight === 0){
+      return false;
+    }
+
     // Check this element and all parents for hidden style
     while (element != null) {
-      if (element.currentStyle && (element.currentStyle['display'] == 'none' || element.currentStyle['visibility'] == 'hidden')) {
-        visible = false;
-        break;
+      var style = window.getComputedStyle(element);
+      if (style && (style['display'] == 'none' || style['visibility'] == 'hidden')) {
+        return false;
       }
       element = element.parentNode;
     }
@@ -133,38 +136,53 @@ var Features = {
       }
 
       return words;
-  },
+  }
 }
 
 function elementToFeatureVector(elem) {
     // Features TODO:
-      // text matching of element & relatives
       // position (relative to last action?)
       // scrolled into view?
       // color?
       // CSS class names
-      // tabIndex
+      // clickable area
 
-    // Features in python_style since it's being shipped off there
-    return [Features.isVisible(elem)? 1:0, 
-            // check whether its something we can click or type in
-            _.contains(CLICKABLE_TAGS, elem.tagName) ? 1:0,
-            _.contains(TYPEABLE_TAGS, elem.tagName) ? 1:0, 
+    return {
+      width: elem.clientWidth,
+      height: elem.clientHeight,
+      clickable: _.contains(CLICKABLE_TAGS, elem.tagName) ? 1:0,
+      typeable: _.contains(TYPEABLE_TAGS, elem.tagName) ? 1:0,
+      tagname_edit: minEditDistanceForWord(elem.tagName.toLowerCase(), word_list),
+      text_edit: minEditDistanceForWords(Features.getTextWords(elem), word_list),
+      sibling_text_edit: minEditDistanceForWords(Features.getSiblingTextWords(elem), word_list),
+      text_size: Features.getTextWords(elem).length,
+      n_children: elem.children.length,
+      tab_index: elem.tabIndex,
+      text: elem.textContent, 
+      id: elem.id,
+      class_list: elem.classList
+    }
 
-            minEditDistanceForWord(elem.tagName.toLowerCase(), word_list),
-            minEditDistanceForWords(Features.getTextWords(elem), word_list),
-            minEditDistanceForWords(Features.getSiblingTextWords(elem), word_list),
-
-
-            
-            Features.getTextWords(elem).length,
-            elem.children.length,
-            
+    /*return [ elem,
             // Note that left/top might not include scroll offset?
             // http://ejohn.org/blog/getboundingclientrect-is-awesome/
             elem.clientTop,
             elem.clientWidth,
             elem.clientHeight,
+
+            // Check whether its something we can click or type in
+            _.contains(CLICKABLE_TAGS, elem.tagName) ? 1:0,
+            _.contains(TYPEABLE_TAGS, elem.tagName) ? 1:0,
+
+            Features.probButtonSize(elem),
+
+            minEditDistanceForWord(elem.tagName.toLowerCase(), word_list),
+            minEditDistanceForWords(Features.getTextWords(elem), word_list),
+            minEditDistanceForWords(Features.getSiblingTextWords(elem), word_list),
+
+            Features.getTextWords(elem).length,
+            elem.children.length,
+            
             // This is another one that might be better treated relative the last
             // element interacted with, and maybe have -1 special coded to something
             // for the regression to work better
@@ -172,7 +190,7 @@ function elementToFeatureVector(elem) {
             //minEditDistanceForWords(elem.classList, word_list)];
             elem.textContent, 
             elem.id,
-            elem.classList];
+            elem.classList];*/
 }
 
 // produces a list of all Elements in the body of the page that are currently visible
@@ -182,7 +200,10 @@ function getAllElementFeatures(){
     for(var i=0;i<root.children.length;i++){
             var this_child = root.children[i];
 
-            elements.push(elementToFeatureVector(this_child))
+            if (!Features.isVisible(this_child)){
+              continue;
+            }
+            elements.push([this_child, elementToFeatureVector(this_child)])
             elements = elements.concat(recGetAllElems(this_child));
     }
     return elements;

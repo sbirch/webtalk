@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
+import uuid
 
 def get_driver():
 	driver = webdriver.Chrome(executable_path="./chromedriver")
@@ -14,20 +15,19 @@ def plog(driver, log_type='browser'):
 	for log in logs:
 		print log['level'], log['message']
 
-def highlight_element(driver, element):
-	try:
-		driver.find_element_by_id("selenium-highlight-dhq8gcnaasx0")
-	except NoSuchElementException:
-		driver.execute_script('''
-			var e = document.createElement('div');
-			e.id = 'selenium-highlight-dhq8gcnaasx0';
-			e.style.position = 'absolute';
-			e.style.backgroundColor = 'rgba(255, 0, 0, 0.5)';
-			e.style.zIndex = '999999999999999';
-			e.style.border = '3px dashed #000';
-			e.style.pointerEvents = 'none';
-			document.body.appendChild(e);
-		''')
+def highlight(driver, element, r=255, g=0, b=0, opacity=0.1):
+	random_id = uuid.uuid4()
+
+	driver.execute_script('''
+		var e = document.createElement('div');
+		e.id = 'selenium-highlight-%s';
+		e.style.position = 'absolute';
+		e.style.backgroundColor = 'rgba(%d, %d, %d, %f)';
+		e.style.zIndex = '999999999999999';
+		e.style.border = '3px dashed #000';
+		e.style.pointerEvents = 'none';
+		document.body.appendChild(e);
+	''' % (random_id, r, g, b, opacity))
 
 	top = element.location['y']
 	left = element.location['x']
@@ -35,14 +35,29 @@ def highlight_element(driver, element):
 	height = element.size['height']
 
 	driver.execute_script('''
-			var e = document.getElementById('selenium-highlight-dhq8gcnaasx0');
+			var e = document.getElementById('selenium-highlight-%s');
 			e.style.top = '%dpx';
 			e.style.left = '%dpx';
 			e.style.width = '%dpx';
 			e.style.height = '%dpx';
-		''' % (top, left, width, height))
+		''' % (random_id, top, left, width, height))
 
-	print 'Overlaid %dx%d at (%d,%d)' % (width, height, left, top)
+	#print 'Overlaid %dx%d at (%d,%d)' % (width, height, left, top)
+
+	return random_id
+
+def unhighlight(highlight_id):
+	try:
+		driver.find_element_by_id("selenium-highlight-%s" % highlight_id)
+		
+		driver.execute_script('''
+			var e = document.getElementById('selenium-highlight-%s');
+			e.parentNode.removeChild(e)
+		''' % (random_id))
+
+		return True
+	except NoSuchElementException:
+		return False
 
 
 def type_on_element(driver, element, content):
