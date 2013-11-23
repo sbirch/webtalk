@@ -4,6 +4,8 @@ import util.seutil as seutil
 import sys
 import time
 import scipy.stats
+from numpy import array
+from util import str_util
 
 get_features_js = "js/get-features.js"
 underscore_js = "js/underscore.js"
@@ -16,7 +18,20 @@ tick('Loading page')
 driver.get("http://www.hipmunk.com/flights-search")
 tock()
 
-
+# convert an object from the javascript to an Array of numerical features
+def web_obj_to_vector(obj):
+    return array([obj["width"],
+                obj["height"],
+                obj["clickable"],
+                obj["typeable"],
+                obj["tagname_edit"],
+                str_util.getMinDistanceForWords(f["text_words"], words),
+                str_util.getMinDistanceForWords(f["sibling_text_words"], words),
+                obj["text_size"],
+                obj["n_children"],
+                obj["tab_index"],
+                str_util.getMinDistanceForWord(f["id"], words)])
+                #str_util.getMinDistanceForWords(f["class_list"], words)])
 def extend_feature(element, feature):
     feature['element'] = element
 
@@ -41,15 +56,17 @@ try:
     tock()
 
     features = [extend_feature(*f) for f in features]
+    words = ["click", "the", "search", "button"]
 
+    tick('feature vectors')
     for f in features:
+        print f["text"]
+        print web_obj_to_vector(f)
+    tock()
 
-        print f
-        #seutil.highlight(driver, f[0], r=255, g=255*f[1], b=255*f[2], opacity=0.2*(f[1]+f[2]) + 0.05)
-        #seutil.highlight(driver, f[0], r=255, g=255*f[1], b=255*f[2], opacity=f[3])
-        
-        pass
-    
+
+
+
     print 'Got %d feature vectors' % len(features)
     #time.sleep(100)
 finally:
