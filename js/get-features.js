@@ -1,5 +1,5 @@
 var SHORT_WORD_LEN = 3
-var word_list = ["Search", "roflroflrlol", "shit"]; //filter_word_list(arguments[0])
+//var word_list = ["Search", "roflroflrlol", "shit"]; //filter_word_list(arguments[0])
 
 // simplyifying assumption that only these kinds of tags can be targets of click
 // actions
@@ -150,23 +150,23 @@ function elementToFeatureVector(elem) {
     return {
       width: elem.clientWidth,
       height: elem.clientHeight,
+
       clickable: _.contains(CLICKABLE_TAGS, elem.tagName) ? 1:0,
       typeable: _.contains(TYPEABLE_TAGS, elem.tagName) ? 1:0,
+
       tagname: elem.tagName,
-      tagname_edit: minEditDistanceForWord(elem.tagName.toLowerCase(), word_list),
       text_words: Features.getTextWords(elem),
       sibling_text_words: Features.getSiblingTextWords(elem),
+
       text_size: Features.getTextWords(elem).length,
       n_children: elem.children.length,
       tab_index: elem.tabIndex,
-      text: elem.textContent, 
       id: elem.id,
       class_list: elem.classList
     }
 
     /*return [ elem,
-            // Note that left/top might not include scroll offset?
-            // http://ejohn.org/blog/getboundingclientrect-is-awesome/
+
             elem.clientTop,
             elem.clientWidth,
             elem.clientHeight,
