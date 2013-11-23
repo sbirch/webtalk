@@ -32,23 +32,22 @@ try:
 
     #print 'Got %d elements' % len(elements)
 
+    print 'click!!'
+    time.sleep(15)
+
     tick('Loading underscore')
     driver.execute_script(open(underscore_js).read())
     tock()
 
     tick('JS enumeration')
-    features = driver.execute_script(open(get_features_js).read())
+    extract = driver.execute_script(open(get_features_js).read())
     tock()
 
+    features = extract['features']
+
+    print extract['tree']
+
     features = [extend_feature(*f) for f in features]
-
-    for f in features:
-
-        print f
-        #seutil.highlight(driver, f[0], r=255, g=255*f[1], b=255*f[2], opacity=0.2*(f[1]+f[2]) + 0.05)
-        #seutil.highlight(driver, f[0], r=255, g=255*f[1], b=255*f[2], opacity=f[3])
-        
-        pass
     
     print 'Got %d feature vectors' % len(features)
     #time.sleep(100)
