@@ -5,15 +5,21 @@ import time
 def policy(state, theta):
 	'''Returns an action (element, action info.)'''
 
-	print state.project_down()
+	actions = state.enumerate_actions()
+	print '%d actions' % len(actions)
 
-	return web.Action(random.choice(state.features)['element'], 'click')
+	action = state.choose_action(actions, theta)
+	print 'Chose', action
+
+	return action
 
 try:
 	driver = web.start("http://www.hipmunk.com/flights-search")
 
-	command = 'click on search'
-	action = policy(web.build_state(driver, command), None)
+	command = web.tokenize_command('click on the search button')
+	state = web.build_state(driver, command)
+
+	action = policy(state, None)
 	action.perform(driver, dry=True)
 
 	time.sleep(15)

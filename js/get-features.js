@@ -230,11 +230,11 @@ function elementTree(){
     return elements;
   }
 
-  return rec(document.body);
+  return ['BODY', rec(document.body)];
 }
 
 
-return {
-  features: getAllElementFeatures(),
-  tree: elementTree(document.body)
-}
+return [
+  getAllElementFeatures(),
+  elementTree(document.body)
+]
