@@ -140,16 +140,17 @@ var Features = {
 }
 
 function elementToFeatureVector(elem) {
-    // Features TODO:
-      // position (relative to last action?)
-      // scrolled into view?
-      // color?
-      // CSS class names
-      // clickable area
+    var rect = elem.getBoundingClientRect();
 
     return {
-      width: elem.clientWidth,
-      height: elem.clientHeight,
+      width: rect.width,
+      height: rect.height,
+
+      // 0 = center of the page
+      relative_x: Math.abs((rect.left + window.scrollX - document.body.clientWidth*0.5) / document.body.clientWidth),
+      // higher = further down
+      // < 0 = before fold, 1 = 1 height under fold
+      relative_y: ((rect.top +  window.scrollY) / window.innerHeight) - 1,
 
       clickable: _.contains(CLICKABLE_TAGS, elem.tagName) ? 1:0,
       typeable: _.contains(TYPEABLE_TAGS, elem.tagName) ? 1:0,
@@ -161,37 +162,12 @@ function elementToFeatureVector(elem) {
       text_size: Features.getTextWords(elem).length,
       n_children: elem.children.length,
       tab_index: (elem.tabIndex == -1)? 0:1,
+
       id: elem.id,
-      class_list: elem.classList
+      class_list: elem.classList,
+      has_id: (elem.id === '')? 0:1,
+      has_class: (elem.classList.length > 0)? 1:0
     }
-
-    /*return [ elem,
-
-            elem.clientTop,
-            elem.clientWidth,
-            elem.clientHeight,
-
-            // Check whether its something we can click or type in
-            _.contains(CLICKABLE_TAGS, elem.tagName) ? 1:0,
-            _.contains(TYPEABLE_TAGS, elem.tagName) ? 1:0,
-
-            Features.probButtonSize(elem),
-
-            minEditDistanceForWord(elem.tagName.toLowerCase(), word_list),
-            minEditDistanceForWords(Features.getTextWords(elem), word_list),
-            minEditDistanceForWords(Features.getSiblingTextWords(elem), word_list),
-
-            Features.getTextWords(elem).length,
-            elem.children.length,
-            
-            // This is another one that might be better treated relative the last
-            // element interacted with, and maybe have -1 special coded to something
-            // for the regression to work better
-            elem.tabIndex,
-            //minEditDistanceForWords(elem.classList, word_list)];
-            elem.textContent, 
-            elem.id,
-            elem.classList];*/
 }
 
 // produces a list of all Elements in the body of the page that are currently visible

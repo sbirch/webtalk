@@ -18,7 +18,7 @@ def filter_word_list(w_list):
 def get_min_distance_for_word(w, word_list):
     min_dist = len(w)
     for w2 in word_list:
-        d = dist(w,w2)
+        d = dist(w.lower(),w2.lower())
 
         if d < min_dist:
             min_dist = d

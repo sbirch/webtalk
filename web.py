@@ -7,6 +7,7 @@ import time
 import itertools
 import random
 import math
+import scipy.stats as stats
 import numpy as np
 
 GET_FEATURES_JS = "js/get-features.js"
@@ -29,7 +30,12 @@ class Action:
         'tagname_edit',
         'typeable',
         'clickable',
-        'text_size'
+        'text_size',
+        'has_id',
+        'has_class',
+        'button_model',
+        'relative_x',
+        'relative_y'
     ]
 
     def __init__(self, element, atype, features, params=None):
@@ -87,10 +93,15 @@ class State:
                 actions.append(Action(el['element'], 'click', el))
         return actions
 
-    def phi_dot_theta(self, action, theta):
+    def phi_dot_theta(self, action, theta, verbose=False):
         phi = action.as_numeric_vector()
-        return np.dot(phi, theta)
 
+        if verbose:
+            print 'Product:'
+            for i,f in enumerate(Action.FEATURE_NAMES):
+                print '\t', phi[i]*theta[i], f, phi[i], '*', theta[i]
+        
+        return np.dot(phi, theta)
 
     def get_action_probs(self, actions, theta):
         '''Chooses the modal action'''
@@ -123,9 +134,19 @@ def start(url):
 def extend_feature(element, feature, command):
     feature['element'] = element
 
-    feature['tagname_edit'] = str_util.get_min_distance_for_words(command, feature['tagname'])
+    feature['tagname_edit'] = str_util.get_min_distance_for_words(command, [feature['tagname']])
     feature['text_words_edit'] = str_util.get_min_distance_for_words(command, feature['text_words'])
     feature['sibling_text_words_edit'] = str_util.get_min_distance_for_words(command, feature['sibling_text_words'])
+
+    w,h = feature['width'], feature['height']
+    mx, my, sx, sy = 54.611, 25.206, 43.973, 6.467
+    feature['button_model'] = 1e4 * (stats.norm.cdf(h+1, loc=my, scale=sy) - stats.norm.cdf(h, loc=my, scale=sy)) * (stats.norm.cdf(w+1, loc=mx, scale=sx) - stats.norm.cdf(w, loc=mx, scale=sx))
+
+    # new on page?
+    # position (relative to last action?)
+    # color
+    # relative tab index
+    # text specificity, 
 
     return feature
 
