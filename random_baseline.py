@@ -9,7 +9,7 @@ def policy(state, theta):
 	actions = state.enumerate_actions()
 	print '%d actions' % len(actions)
 
-	action, score = state.choose_action(actions, theta)
+	action, score, probs = state.get_action_probs(actions, theta)
 	print 'Chose', action, 'with score', score
 
 	return action

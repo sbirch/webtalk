@@ -91,7 +91,8 @@ class State:
         phi = action.as_numeric_vector()
         return np.dot(phi, theta)
 
-    def choose_action(self, actions, theta):
+
+    def get_action_probs(self, actions, theta):
         '''Chooses the modal action'''
         products = {}
 
@@ -112,7 +113,7 @@ class State:
 
                 max_v = products[action]
 
-        return random.choice(max_action), max_v
+        return random.choice(max_action), max_v, products
 
 def start(url):
     driver = seutil.get_driver()
@@ -139,4 +140,4 @@ def build_state(driver, command):
     features, tree = extract(driver, command)
     return State(command, features)
 
-    
+
