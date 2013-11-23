@@ -100,7 +100,7 @@ class State:
             print 'Product:'
             for i,f in enumerate(Action.FEATURE_NAMES):
                 print '\t', phi[i]*theta[i], f, phi[i], '*', theta[i]
-        
+
         return np.dot(phi, theta)
 
     def get_action_probs(self, actions, theta):
@@ -124,6 +124,7 @@ class State:
 
                 max_v = products[action]
 
+        print products
         return random.choice(max_action), max_v, products
 
 def start(url):
@@ -146,7 +147,7 @@ def extend_feature(element, feature, command):
     # position (relative to last action?)
     # color
     # relative tab index
-    # text specificity, 
+    # text specificity,
 
     return feature
 
