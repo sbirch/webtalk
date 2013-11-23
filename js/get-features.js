@@ -160,7 +160,7 @@ function elementToFeatureVector(elem) {
 
       text_size: Features.getTextWords(elem).length,
       n_children: elem.children.length,
-      tab_index: elem.tabIndex,
+      tab_index: (elem.tabIndex == -1)? 0:1,
       id: elem.id,
       class_list: elem.classList
     }
