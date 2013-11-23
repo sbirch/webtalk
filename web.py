@@ -20,6 +20,23 @@ class Action:
             else:
                 self.element.click()
 
+class State:
+    def __init__(self, command, features):
+        self.command = command
+        self.features = features
+    def project_down(self):
+        state = []
+        for f in self.features:
+            if f['clickable'] == 1 or f['typeable'] == 1:
+                state.append((
+                    f['width'],
+                    f['height'],
+                    f['id'],
+                    ' '.join(f['class_list'])
+                ))
+
+        return tuple(state)
+
 def extend_feature(element, feature):
     feature['element'] = element
     return feature
@@ -31,8 +48,11 @@ def start(url):
 
 def get_features(driver):
     driver.execute_script(open(UNDERSCORE_JS).read())
-    features = driver.execute_script(open(GET_FEATURES_JS).read())
+    features = driver.execute_script(open(GET_FEATURES_JS).read())['features']
     return [extend_feature(*f) for f in features]
 
 def build_state(driver, command):
-    return (command, get_features(driver))
+    features = get_features(driver)
+    return State(command, features)
+
+    

@@ -47,12 +47,15 @@ try:
 
     #print 'Got %d elements' % len(elements)
 
+    print 'click!!'
+    time.sleep(15)
+
     tick('Loading underscore')
     driver.execute_script(open(underscore_js).read())
     tock()
 
     tick('JS enumeration')
-    features = driver.execute_script(open(get_features_js).read())
+    extract = driver.execute_script(open(get_features_js).read())
     tock()
 
     features = [extend_feature(*f) for f in features]

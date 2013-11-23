@@ -6,7 +6,7 @@ var word_list = ["Search", "roflroflrlol", "shit"]; //filter_word_list(arguments
 var CLICKABLE_TAGS = ["A", "BUTTON"];
 
 //typeable tags
-var TYPEABLE_TAGS = ["INPUT"];
+var TYPEABLE_TAGS = ["INPUT", 'TEXTAREA'];
 
 var ALL_TAGS = CLICKABLE_TAGS.concat(TYPEABLE_TAGS);
 
@@ -152,6 +152,7 @@ function elementToFeatureVector(elem) {
       height: elem.clientHeight,
       clickable: _.contains(CLICKABLE_TAGS, elem.tagName) ? 1:0,
       typeable: _.contains(TYPEABLE_TAGS, elem.tagName) ? 1:0,
+      tagname: elem.tagName,
       tagname_edit: minEditDistanceForWord(elem.tagName.toLowerCase(), word_list),
       text_words: Features.getTextWords(elem),
       sibling_text_words: Features.getSiblingTextWords(elem),
@@ -212,5 +213,28 @@ function getAllElementFeatures(){
   return recGetAllElems(document.body);
 }
 
-feats = getAllElementFeatures()
-return feats
+function elementTree(){
+  function rec(root) {
+    var elements = [];
+    for(var i=0;i<root.children.length;i++){
+            var this_child = root.children[i];
+
+            if (!Features.isVisible(this_child)){
+              continue;
+            }
+
+            var label = this_child.tagName + (this_child.id? '#'+this_child.id:'');
+
+            elements.push([label, rec(this_child)]);
+    }
+    return elements;
+  }
+
+  return rec(document.body);
+}
+
+
+return {
+  features: getAllElementFeatures(),
+  tree: elementTree(document.body)
+}
