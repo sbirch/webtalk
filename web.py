@@ -56,7 +56,7 @@ class Action:
     def __repr__(self):
         if self.params == None:
             return '<Action %s on %s#%s>' % (self.type, self.features['tagname'], self.features['id'])
-        return '<Action %s on %r, %s#%s>' % (self.type, self.features['tagname'], self.features['id'], self.params)
+        return '<Action %s on %r, %s#%s>' % (self.type, self.params, self.features['tagname'], self.features['id'])
 
 class State:
     def __init__(self, command, features):
@@ -78,9 +78,6 @@ class State:
         return self._subcommand_cache
 
     def enumerate_actions(self):
-        # TODO:
-            # filter out typing on the many elements that don't support it
-            # (since that's a very limited set of HTML element types)
         actions = []
         for el in self.features:
             if el['typeable'] == 1:

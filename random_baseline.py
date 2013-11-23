@@ -12,8 +12,6 @@ def policy(state, theta):
 	action, score = state.choose_action(actions, theta)
 	print 'Chose', action, 'with score', score
 
-	print action.features
-
 	return action
 
 try:
