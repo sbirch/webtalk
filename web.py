@@ -126,19 +126,6 @@ class State:
 
         return random.choice(max_action), max_v, products
 
-    def get_actions_and_probs(self, theta):
-        '''Compute get_action_probs with the actions from enumerate_actions,
-        plus some horrific caching.'''
-        if hasattr(self, '_act_prob_cache') and self._act_prob_cache.has_key(tuple(theta)):
-            return self._act_prob_cache[tuple(theta)]
-
-        act_probs = self.get_action_probs(self.enumerate_actions(), theta)
-
-        if not hasattr(self, '_act_prob_cache'):
-            self._act_prob_cache = {}
-        self._act_prob_cache[tuple(theta)] = act_probs
-        return act_probs
-
 def start(url):
     driver = seutil.get_driver()
     driver.get(url)

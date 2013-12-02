@@ -24,7 +24,8 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
             for t in range(len(document)):
                 state = web.build_state(driver, web.tokenize_command(document[t]))
 
-                action, best_score, probs = state.get_actions_and_probs(theta)
+                actions = state.enumerate_actions()
+                action, best_score, probs = state.get_action_probs(actions, theta)
 
                 print "Performing... %" , action
                 action.perform(driver, True)
