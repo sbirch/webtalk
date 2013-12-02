@@ -176,7 +176,7 @@ function getAllElementFeatures(){
     var elements = [];
     for(var i=0;i<root.children.length;i++){
             var this_child = root.children[i];
-            if (!Features.isVisible(this_child)){
+            if (!Features.isVisible(this_child) || this_child.id.substring(0,18) == 'selenium-highlight'){
               continue;
             }
             elements.push([this_child, elementToFeatureVector(this_child)])

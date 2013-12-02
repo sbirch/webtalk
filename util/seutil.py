@@ -35,6 +35,7 @@ def highlight(driver, element, r=255, g=0, b=0, opacity=0.1):
     width = element.size['width']
     height = element.size['height']
 
+    # Note! These IDs are filtered out in get-features.js
     driver.execute_script('''
             var e = document.getElementById('selenium-highlight-%s');
             e.style.top = '%dpx';
