@@ -3,11 +3,14 @@ import web
 import random
 import time
 
-ITERATIONS = 20
+ITERATIONS = 5
 
 # takes in a list of lists of commands which should be executed in order
 def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
-    theta = np.array([ -5.0, 0.0, 0.0, 0, 11.0, 0.0, 5.0, 5.0, 1.0, -1.0, -1.0 ])
+    theta = np.zeros(len(web.Action.FEATURE_NAMES))
+    for i in range(len(web.Action.FEATURE_NAMES)):
+        theta[i] = random.random()
+
     driver = web.start("http://www.hipmunk.com/flights-search")
 
     for i in range(ITERATIONS):
@@ -59,8 +62,11 @@ def reward(history):
 
 if __name__ == "__main__":
     docs = [["click search"]]
-    for i in range(1):
-        print policy_gradient(docs)
+    for i in range(10):
+        res = policy_gradient(docs)
+        print "Result theta: "
+        print res
+        print
 
 
 
