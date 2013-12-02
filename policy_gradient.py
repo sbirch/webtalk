@@ -2,6 +2,7 @@ import numpy as np
 import web
 import random
 import time
+import util.str_util as str_util
 
 ITERATIONS = 20
 
@@ -11,7 +12,7 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
     driver = web.start("http://www.hipmunk.com/flights-search")
 
     for i in range(ITERATIONS):
-        for document in command_documents:
+        for doc_num, document in enumerate(command_documents):
             state_actions = []
             action_choices = []
 
@@ -20,12 +21,16 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
             for t in range(len(document)):
                 state = web.build_state(driver, web.tokenize_command(document[t]))
 
-                actions = state.enumerate_actions()
-                action, score, probs = state.get_action_probs(actions, theta)
+                action, best_score, probs = state.get_actions_and_probs(theta)
 
                 print "Performing... %" , action
                 action.perform(driver, True)
-                state_actions.append((state, action))
+
+                state_actions.append((
+                    state,
+                    action,
+                    best_score
+                ))
                 action_choices.append(probs)
 
             gradient = np.zeros(len(web.Action.FEATURE_NAMES))
@@ -48,8 +53,24 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
             print theta
     driver.quit()
     return theta
+
+def reward_branavan(history):
+    
+    sentence_rewards = []
+
+    for state, action, best_score in history:
+        # did the action make sense for state?
+        # we assess by seeing if any word in the command appeared in the element we chose.
+        chosen_element_words = action.features['text_words']
+        if str_util.get_min_distance_for_words(state.command, chosen_element_words) == 0:
+            sentence_rewards.append(best_score)
+        else:
+            return -1
+
+    return sum(sentence_rewards)*1.0 / len(sentence_rewards)
+
 def reward(history):
-    last_state, last_action = history[-1]
+    last_state, last_action, last_best_score = history[-1]
     classes = set(last_action.element.get_attribute("class").split())
 
     search_classes = set(["submit front-box-search-button m-flight m-active"])
