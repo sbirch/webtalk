@@ -24,13 +24,13 @@ class Action:
     FEATURE_NAMES = [
         'text_words_edit',
         'n_children',
-        'width',
-        'height',
+        #'width',
+        #'height',
         'sibling_text_words_edit',
         'tagname_edit',
         'typeable',
         'clickable',
-        'text_size',
+        #'text_size',
         'has_id',
         'has_class',
         'button_model',
@@ -60,9 +60,11 @@ class Action:
         ])
 
     def __repr__(self):
+        classes = self.element.get_attribute("class")
         if self.params == None:
-            return '<Action %s on %s#%s>' % (self.type, self.features['tagname'], self.features['id'])
-        return '<Action %s on %r, %s#%s>' % (self.type, self.params, self.features['tagname'], self.features['id'])
+            return '<Action %s on %s#%s.%s>' % (self.type, self.features['tagname'], self.features['id'], classes)
+        return '<Action %s on %r, %s#%s.%s>' % (self.type, self.params, self.features['tagname'], self.features['id'], classes)
+
 
 class State:
     def __init__(self, command, features):
@@ -124,7 +126,6 @@ class State:
 
                 max_v = products[action]
 
-        print products
         return random.choice(max_action), max_v, products
 
 def start(url):
@@ -149,6 +150,10 @@ def extend_feature(element, feature, command):
     # relative tab index
     # text specificity,
 
+    # remove the dimensions because big numbers like that are problematic...
+    del feature['width']
+    del feature['height']
+    del feature['text_size']
     return feature
 
 def extract(driver, command):
