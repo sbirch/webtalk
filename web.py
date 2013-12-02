@@ -77,9 +77,7 @@ class State:
 
         subcommands = []
         for window_size in range(1, len(self.command)+1):
-            #print 'window', window_size
             for i in range(0, len(self.command)-window_size+1):
-                #print 'range', i, i+window_size, self.command[i:i+window_size]
                 subcommands.append(self.command[i:i+window_size])
 
         self._subcommand_cache = subcommands
@@ -133,17 +131,23 @@ def start(url):
     driver.get(url)
     return driver
 
-def extend_feature(element, feature, command):
+def extend_and_norm_feature(element, feature, command, num_elems):
     feature['element'] = element
 
-    feature['tagname_edit'] = str_util.get_min_distance_for_words(command, [feature['tagname']])
-    feature['text_words_edit'] = str_util.get_min_distance_for_words(command, feature['text_words'])
-    feature['sibling_text_words_edit'] = str_util.get_min_distance_for_words(command, feature['sibling_text_words'])
+    feature['tagname_edit'] = str_util.get_normed_dist_for_words(command, [feature['tagname']])
+    feature['text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['text_words'])
+    feature['sibling_text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['sibling_text_words'])
+    feature['n_children'] = float(feature['n_children']) / num_elems
 
     w,h = feature['width'], feature['height']
     mx, my, sx, sy = 54.611, 25.206, 43.973, 6.467
     feature['button_model'] = 1e4 * (stats.norm.cdf(h+1, loc=my, scale=sy) - stats.norm.cdf(h, loc=my, scale=sy)) * (stats.norm.cdf(w+1, loc=mx, scale=sx) - stats.norm.cdf(w, loc=mx, scale=sx))
 
+
+    # relative x and y can  be more than 1 because things can be beyond the edge of the window
+    # so nudge things to be between -1 and 1
+    feature['relative_x'] = np.arctan(1 * (feature['relative_x'] + 0.5)) / (np.pi / 2)
+    feature['relative_y'] = np.arctan(1 * feature['relative_y']) / (np.pi / 2)
     # new on page?
     # position (relative to last action?)
     # color
@@ -159,7 +163,7 @@ def extend_feature(element, feature, command):
 def extract(driver, command):
     driver.execute_script(open(UNDERSCORE_JS).read())
     features, tree = driver.execute_script(open(GET_FEATURES_JS).read())
-    features = [extend_feature(f[0], f[1], command) for f in features]
+    features = [extend_and_norm_feature(f[0], f[1], command, len(features)) for f in features]
 
     return features, tree
 

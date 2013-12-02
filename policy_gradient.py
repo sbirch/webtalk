@@ -8,8 +8,8 @@ ITERATIONS = 5
 # takes in a list of lists of commands which should be executed in order
 def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
     theta = np.zeros(len(web.Action.FEATURE_NAMES))
-    for i in range(len(web.Action.FEATURE_NAMES)):
-        theta[i] = random.random()
+    #for i in range(len(web.Action.FEATURE_NAMES)):
+    #    theta[i] = random.random()
 
     driver = web.start("http://www.hipmunk.com/flights-search")
 
@@ -48,17 +48,17 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
             r = reward(state_actions)
 
             theta = np.add(theta, np.multiply(r, gradient))
-            print theta
     driver.quit()
     return theta
 def reward(history):
-    last_state, last_action = history[-1]
-    classes = set(last_action.element.get_attribute("class").split())
+    #last_state, last_action = history[-1]
+    #classes = set(last_action.element.get_attribute("class").split())
 
-    search_classes = set(["submit front-box-search-button m-flight m-active"])
+    #search_classes = set(["submit front-box-search-button m-flight m-active"])
 
 
-    return len(classes.intersection(search_classes))
+    #return len(classes.intersection(search_classes))
+    return random.randint(0,10)
 
 if __name__ == "__main__":
     docs = [["click search"]]

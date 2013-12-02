@@ -15,6 +15,15 @@ def filter_word_list(w_list):
             new_list.append(w)
     return new_list
 
+def get_normed_dist_for_word(w, word_list):
+    norm_f = max(len(w),max([len(word) for word in word_list]))
+    return float(get_min_distance_for_word(w, word_list)) / norm_f
+
+def get_normed_dist_for_words(w_list1, w_list2):
+    norm_f = max([len(word) for word in w_list1 + w_list2])
+    return float(get_min_distance_for_words(w_list1, w_list2)) / norm_f
+
+
 def get_min_distance_for_word(w, word_list):
     min_dist = len(w)
     for w2 in word_list:
