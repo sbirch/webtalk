@@ -149,8 +149,8 @@ function elementToFeatureVector(elem) {
       // 0 = center of the page
       relative_x: Math.abs((rect.left + window.scrollX - document.body.clientWidth*0.5) / document.body.clientWidth),
       // higher = further down
-      // < 0 = before fold, 1 = 1 height under fold
-      relative_y: ((rect.top +  window.scrollY) / window.innerHeight) - 1,
+      // 0 = top of page, 1 = at fold
+      relative_y: ((rect.top +  window.scrollY) / window.innerHeight),
 
       clickable: _.contains(CLICKABLE_TAGS, elem.tagName) ? 1:0,
       typeable: _.contains(TYPEABLE_TAGS, elem.tagName) ? 1:0,
@@ -176,14 +176,13 @@ function getAllElementFeatures(){
     var elements = [];
     for(var i=0;i<root.children.length;i++){
             var this_child = root.children[i];
-
             if (!Features.isVisible(this_child)){
               continue;
             }
             elements.push([this_child, elementToFeatureVector(this_child)])
             elements = elements.concat(recGetAllElems(this_child));
     }
-    return elements;
+    return elements
   }
 
   return recGetAllElems(document.body);
@@ -209,8 +208,9 @@ function elementTree(){
   return ['BODY', rec(document.body)];
 }
 
+res = getAllElementFeatures()
 
 return [
-  getAllElementFeatures(),
+  res,
   elementTree(document.body)
 ]
