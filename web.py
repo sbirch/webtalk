@@ -21,6 +21,9 @@ def untokenize_subcommand(sub):
     return ' '.join(sub)
 
 class Action:
+    # These are the features used in the numeric representation of the feature
+    # vector corresponding to this Action. There are some features from get-features.js
+    # and/or extend_and_norm_feature which are dropped from this representation.
     FEATURE_NAMES = [
         'text_words_edit',
         'n_children',
@@ -148,16 +151,12 @@ def extend_and_norm_feature(element, feature, command, num_elems):
     # so nudge things to be between -1 and 1
     feature['relative_x'] = np.arctan(1 * (feature['relative_x'] + 0.5)) / (np.pi / 2)
     feature['relative_y'] = np.arctan(1 * feature['relative_y']) / (np.pi / 2)
+
     # new on page?
     # position (relative to last action?)
     # color
     # relative tab index
-    # text specificity,
-
-    # remove the dimensions because big numbers like that are problematic...
-    del feature['width']
-    del feature['height']
-    del feature['text_size']
+    # text specificity
     return feature
 
 def extract(driver, command):
