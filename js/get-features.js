@@ -142,6 +142,14 @@ var Features = {
 function elementToFeatureVector(elem) {
     var rect = elem.getBoundingClientRect();
 
+    // FIX:
+      // best relative_x is 0
+      // clickable, typeable should be dual sign
+      // edit distances are all best at 0
+      // text size & n_children?
+      // tab index should be dual sign
+      // has_id and has_class should be dual
+
     return {
       width: rect.width,
       height: rect.height,
