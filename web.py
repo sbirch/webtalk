@@ -163,7 +163,6 @@ def extend_and_norm_feature(element, feature, command, num_elems):
 
     feature['button_model'] = (likelihood_button * prior) / marginal
 
-
     # relative x and y can  be more than 1 because things can be beyond the edge of the window
     # so nudge things to be between -1 and 1
     feature['relative_x'] = np.arctan(1 * (feature['relative_x'] + 0.5)) / (np.pi / 2)
