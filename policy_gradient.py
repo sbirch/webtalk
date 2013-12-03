@@ -25,6 +25,7 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
                 state = web.build_state(driver, web.tokenize_command(document[t]))
 
                 actions = state.enumerate_actions()
+                assert len(actions) > 0 # If the actions list is empty there will be errors later on. (Perhaps the page failed to load?)
                 action, best_score, probs = state.get_action_probs(actions, theta)
 
                 state.phi_dot_theta(action, theta, verbose=True)
