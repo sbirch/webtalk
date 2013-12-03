@@ -85,7 +85,8 @@ def reward(history):
     return random.randint(0,10)
 
 if __name__ == "__main__":
-    docs = [["type providence into from box", "type new york into to box", "click search"]]
+    #docs = [["type providence into from box", "type new york into to box", "click search"]]
+    docs = [["click search"]]
     for i in range(1):
         res = policy_gradient(docs)
         print "Result theta: "
