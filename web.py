@@ -9,6 +9,7 @@ import random
 import math
 import scipy.stats as stats
 import numpy as np
+import json
 
 GET_FEATURES_JS = "js/get-features.js"
 UNDERSCORE_JS = "js/underscore.js"
@@ -32,13 +33,14 @@ class Action:
         'sibling_text_words_edit',
         'tagname_edit',
         'typeable',
-        'clickable',
+        #'clickable',
         #'text_size',
         'has_id',
         'has_class',
         'button_model',
         'relative_x',
-        'relative_y'
+        'relative_y',
+        'alreadyInteracted',
     ]
 
     def __init__(self, element, atype, features, params=None):
@@ -48,13 +50,20 @@ class Action:
         self.features = features
 
     def perform(self, driver, dry=False):
-        if dry:
+
+        driver.execute_script('''
+            var elem = arguments[0]
+            elem.setAttribute("x-WebtalkInteracted", "1")
+            ''', self.element)
+
+        if dry and self.type == 'click':
             seutil.highlight(driver, self.element, opacity=0.5)
             return
 
         if self.type == 'click':
             self.element.click()
         elif self.type == 'type':
+            self.element.clear()
             self.element.send_keys(untokenize_subcommand(self.params))
 
     def as_numeric_vector(self):
@@ -96,7 +105,7 @@ class State:
                 actions.append(Action(el['element'], 'click', el))
         return actions
 
-    def phi_dot_theta(self, action, theta, verbose=False):
+    def phi_dot_theta(self, action, theta, verbose=True):
         phi = action.as_numeric_vector()
 
         if verbose:
@@ -137,11 +146,11 @@ def start(url):
 
 ELEMENT_DATA = json.load(open('element_sizes.json', 'rb'))
 
-BUTTON_SIZE_KDE = stats.gaussian_kde(numpy.transpose(numpy.array(
+BUTTON_SIZE_KDE = stats.gaussian_kde(np.transpose(np.array(
     [x[1:] for x in ELEMENT_DATA if x[0]]
 )))
 
-ELEMENT_SIZE_KDE = stats.gaussian_kde(numpy.transpose(numpy.array(
+ELEMENT_SIZE_KDE = stats.gaussian_kde(np.transpose(np.array(
     [x[1:] for x in ELEMENT_DATA]
 )))
 
@@ -162,7 +171,7 @@ def extend_and_norm_feature(element, feature, command, num_elems):
     feature['tagname_edit'] = str_util.get_normed_dist_for_words(command, [feature['tagname']])
     feature['text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['text_words'])
     feature['sibling_text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['sibling_text_words'])
-    feature['n_children'] = float(feature['n_children']) / num_elems
+    feature['n_children'] = 1 - float(feature['n_children']) / num_elems
 
     w,h = feature['width'], feature['height']
     mx, my, sx, sy = 54.611, 25.206, 43.973, 6.467

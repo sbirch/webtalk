@@ -173,8 +173,10 @@ function elementToFeatureVector(elem) {
 
       id: elem.id,
       class_list: elem.classList,
-      has_id: (elem.id === '')? -1:1,
-      has_class: (elem.classList.length > 0)? 1:-1
+      has_id: (elem.id === '')? 0:1,
+      has_class: (elem.classList.length > 0)? 1:0,
+
+      alreadyInteracted: elem.getAttribute("x-WebtalkInteracted") == "1"? -1:1,
     }
 }
 
