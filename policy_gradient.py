@@ -29,7 +29,7 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
 
                 state.phi_dot_theta(action, theta, verbose=True)
 
-                print "Performing... %s for %s" % (action, document[t])
+                print "Performing... %r for %r" % (action, document[t])
                 action.perform(driver, True)
 
                 state_actions.append((

@@ -1,0 +1,17 @@
+<html>
+	<head>
+		<title>Send something!</title>
+	</head>
+	<body>
+		<script>
+		var vars = window.location.search.substring(1).split('&');
+		var gets = {};
+		for(var i=0;i<vars.length;i++){
+			vars[i] = vars[i].split('=');
+			gets[vars[i][0]] = vars[i][1];
+		}
+
+		document.write('Thank you for sending a ' + gets['package_type'] + '.')
+		</script>
+	</body>
+</html>
