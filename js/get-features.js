@@ -110,21 +110,11 @@ var Features = {
   // produces a list of filtered words in text 
   // in sibling tags
   getSiblingTextWords: function(element) {
-      var words = []
-
-      var prev_sibling = element.previousElementSibling;
-      while (prev_sibling != null) {
-          words = words.concat(this.getTextWords(prev_sibling));
-          prev_sibling = prev_sibling.previousElementSibling;
-      }
-
-      var next_sibling = element.nextElementSibling;
-      while (next_sibling != null) {
-          words = words.concat(this.getTextWords(next_sibling));
-          next_sibling = next_sibling.nextElementSibling;
-      }
-
-      return words;
+	  if (element.parentNode) {
+		  return Features.getTextWords(element.parentNode);
+	  } else {
+		  return ["farts"];
+	  }
   },
 
   isTypable: function(elem){

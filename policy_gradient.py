@@ -4,17 +4,17 @@ import random
 import time
 import util.str_util as str_util
 
-ITERATIONS = 100
+ITERATIONS = 50
 
 # takes in a list of lists of commands which should be executed in order
-def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
+def policy_gradient(command_documents, start_url = "http://localhost:8000"):
     theta = np.zeros(len(web.Action.FEATURE_NAMES))
-    #for i in range(len(web.Action.FEATURE_NAMES)):
-    #    theta[i] = random.randint(0,10)
+    for i in range(len(web.Action.FEATURE_NAMES)):
+        theta[i] = 1
 
-
-    driver = web.start("http://www.hipmunk.com/flights-search")
+    driver = web.start(start_url)
     for i in range(ITERATIONS):
+        driver.get(start_url)
         for doc_num, document in enumerate(command_documents):
             state_actions = []
             action_choices = []
@@ -26,12 +26,20 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
 
                 actions = state.enumerate_actions()
                 assert len(actions) > 0 # If the actions list is empty there will be errors later on. (Perhaps the page failed to load?)
+                for a in actions:
+                    if a.type == "click":
+                        print a
+                        state.phi_dot_theta(a, theta, verbose=True)
+                        print
+                        print
+                return
+
                 action, best_score, probs = state.get_action_probs(actions, theta)
 
                 state.phi_dot_theta(action, theta, verbose=True)
 
                 print "Performing... %r for %r" % (action, document[t])
-                action.perform(driver, True)
+                action.perform(driver, dry=True)
 
                 state_actions.append((
                     state,
@@ -87,7 +95,12 @@ def reward(history):
 
 if __name__ == "__main__":
     #docs = [["type providence into from box", "type new york into to box", "click search"]]
-    docs = [["click search"]]
+    docs = [[" Enter Andrew in first name box",
+        "Enter Kovacs for last name",
+        "Enter 1337 as box number",
+        "Press continue",
+        "Click flowers",
+        "Click submit"]]
     for i in range(1):
         res = policy_gradient(docs)
         print "Result theta: "
