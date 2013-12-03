@@ -23,6 +23,8 @@ def get_normed_dist_for_words(w_list1, w_list2):
     norm_f = max([len(word) for word in w_list1 + w_list2])
     return  1 - float(get_min_distance_for_words(w_list1, w_list2)) / norm_f
 
+def get_mean_distance_of_words(cmd, text):
+    return sum([get_min_distance_for_word(w, cmd) for w in text]) / float(len(text))
 
 def get_min_distance_for_word(w, word_list):
     min_dist = len(w)
