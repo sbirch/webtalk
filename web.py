@@ -105,13 +105,14 @@ class State:
                 actions.append(Action(el['element'], 'click', el))
         return actions
 
-    def phi_dot_theta(self, action, theta, verbose=True):
+    def phi_dot_theta(self, action, theta, verbose=False):
         phi = action.as_numeric_vector()
 
         if verbose:
             print 'Product:'
             for i,f in enumerate(Action.FEATURE_NAMES):
-                print '\t', phi[i]*theta[i], f, phi[i], '*', theta[i]
+                print '\t%+.4f\t%s\t%.4f * %.4f' % (phi[i]*theta[i], f, phi[i], theta[i])
+
 
         return np.dot(phi, theta)
 

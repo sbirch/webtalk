@@ -27,7 +27,9 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
                 actions = state.enumerate_actions()
                 action, best_score, probs = state.get_action_probs(actions, theta)
 
-                print "Performing... % for %" , action, document[t]
+                state.phi_dot_theta(action, theta, verbose=True)
+
+                print "Performing... %s for %s" % (action, document[t])
                 action.perform(driver, True)
 
                 state_actions.append((
