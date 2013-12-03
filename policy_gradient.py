@@ -62,12 +62,28 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000"):
                 gradient = np.add(gradient, np.subtract(phi_t, weighted_actions))
 
             # STEP 5
-            r = reward_branavan(state_actions)
+            r = reward_gold_standard(state_actions)
             print "Reward: %", r
 
             theta = np.add(theta, np.multiply(r, gradient))
     driver.quit()
     return theta
+
+def reward_gold_standard(history):
+    correct = [
+        ('type', 'firstname', 'Andrew'),
+        ('type', 'lastname', 'Kovacs'),
+        ('type', 'mailbox', '1337'),
+        ('click', 'continue')
+    ]
+
+    for i, (state, action, best_score) in enumerate(history):
+        gold = correct[i]
+        if action.type != gold[0] or action.element.get_attribute('x-wtid') != gold[1] or (action.type == 'type' and action.params != gold[2]):
+            return -1
+
+    return 1
+
 
 def reward_branavan(history):
     sentence_rewards = []
