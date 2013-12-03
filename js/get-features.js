@@ -142,9 +142,17 @@ var Features = {
 function elementToFeatureVector(elem) {
     var rect = elem.getBoundingClientRect();
 
+    // FIX:
+      // best relative_x is 0
+      // edit distances are all best at 0
+      // text size & n_children?
+
     return {
       width: rect.width,
       height: rect.height,
+
+
+      // Note! relative_x and relative_y are both further modified in extend_and_norm_feature.
 
       // 0 = center of the page
       relative_x: Math.abs((rect.left + window.scrollX - document.body.clientWidth*0.5) / document.body.clientWidth),
@@ -152,8 +160,8 @@ function elementToFeatureVector(elem) {
       // 0 = top of page, 1 = at fold
       relative_y: ((rect.top +  window.scrollY) / window.innerHeight),
 
-      clickable: _.contains(CLICKABLE_TAGS, elem.tagName) ? 1:0,
-      typeable: _.contains(TYPEABLE_TAGS, elem.tagName) ? 1:0,
+      clickable: _.contains(CLICKABLE_TAGS, elem.tagName) ? 1:-1,
+      typeable: _.contains(TYPEABLE_TAGS, elem.tagName) ? 1:-1,
 
       tagname: elem.tagName,
       text_words: Features.getTextWords(elem),
@@ -161,7 +169,7 @@ function elementToFeatureVector(elem) {
 
       text_size: Features.getTextWords(elem).length,
       n_children: elem.children.length,
-      tab_index: (elem.tabIndex == -1)? 0:1,
+      tab_index: (elem.tabIndex == -1)? -1:1,
 
       id: elem.id,
       class_list: elem.classList,
