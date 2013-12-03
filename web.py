@@ -9,6 +9,7 @@ import random
 import math
 import scipy.stats as stats
 import numpy as np
+import json
 
 GET_FEATURES_JS = "js/get-features.js"
 UNDERSCORE_JS = "js/underscore.js"
@@ -36,7 +37,7 @@ class Action:
         #'text_size',
         'has_id',
         'has_class',
-        #'button_model',
+        'button_model',
         'relative_x',
         'relative_y',
         'alreadyInteracted',
@@ -145,11 +146,11 @@ def start(url):
 
 ELEMENT_DATA = json.load(open('element_sizes.json', 'rb'))
 
-BUTTON_SIZE_KDE = stats.gaussian_kde(numpy.transpose(numpy.array(
+BUTTON_SIZE_KDE = stats.gaussian_kde(np.transpose(np.array(
     [x[1:] for x in ELEMENT_DATA if x[0]]
 )))
 
-ELEMENT_SIZE_KDE = stats.gaussian_kde(numpy.transpose(numpy.array(
+ELEMENT_SIZE_KDE = stats.gaussian_kde(np.transpose(np.array(
     [x[1:] for x in ELEMENT_DATA]
 )))
 
