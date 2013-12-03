@@ -1,8 +1,5 @@
 var SHORT_WORD_LEN = 3
 
-var ALL_TAGS = CLICKABLE_TAGS.concat(TYPEABLE_TAGS);
-
-
 // Compute the edit distance between the two given strings
 // Taken from: http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#JavaScript
 function getEditDistance(a, b){
