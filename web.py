@@ -145,6 +145,17 @@ ELEMENT_SIZE_KDE = stats.gaussian_kde(numpy.transpose(numpy.array(
     [x[1:] for x in ELEMENT_DATA]
 )))
 
+_LandH_cache = {}
+def likelihood_and_marginal(w, h):
+    if (w,h) in _LandH_cache:
+        return _LandH_cache[(w,h)]
+    #likelihood_button = (stats.norm.cdf(h+1, loc=my, scale=sy) - stats.norm.cdf(h, loc=my, scale=sy)) * (stats.norm.cdf(w+1, loc=mx, scale=sx) - stats.norm.cdf(w, loc=mx, scale=sx))
+    _LandH_cache[(w,h)] = (
+        BUTTON_SIZE_KDE.integrate_box([w,h], [w+1,h+1]), 
+        ELEMENT_SIZE_KDE.integrate_box([w,h], [w+1,h+1])
+    )
+    return _LandH_cache[(w,h)]
+
 def extend_and_norm_feature(element, feature, command, num_elems):
     feature['element'] = element
 
@@ -156,10 +167,8 @@ def extend_and_norm_feature(element, feature, command, num_elems):
     w,h = feature['width'], feature['height']
     mx, my, sx, sy = 54.611, 25.206, 43.973, 6.467
 
-    #likelihood_button = (stats.norm.cdf(h+1, loc=my, scale=sy) - stats.norm.cdf(h, loc=my, scale=sy)) * (stats.norm.cdf(w+1, loc=mx, scale=sx) - stats.norm.cdf(w, loc=mx, scale=sx))
-    likelihood_button = BUTTON_SIZE_KDE.integrate_box([w,h], [w+1,h+1])
     prior = 0.02
-    marginal = ELEMENT_SIZE_KDE.integrate_box([w,h], [w+1,h+1])
+    likelihood_button, marginal = likelihood_and_marginal(w, h)
 
     feature['button_model'] = (likelihood_button * prior) / marginal
 
