@@ -1,12 +1,4 @@
 var SHORT_WORD_LEN = 3
-//var word_list = ["Search", "roflroflrlol", "shit"]; //filter_word_list(arguments[0])
-
-// simplyifying assumption that only these kinds of tags can be targets of click
-// actions
-var CLICKABLE_TAGS = ["A", "BUTTON"];
-
-//typeable tags
-var TYPEABLE_TAGS = ["INPUT", 'TEXTAREA'];
 
 var ALL_TAGS = CLICKABLE_TAGS.concat(TYPEABLE_TAGS);
 
@@ -136,6 +128,22 @@ var Features = {
       }
 
       return words;
+  },
+
+  isTypable: function(elem){
+    if (elem.tagName == 'TEXTAREA'){return true;}
+    else if (elem.tagName == 'INPUT' && _.contains(['text', 'email', 'password', 'search', 'url'], elem.type.toLowerCase())){
+      return true;
+    }
+    return false;
+  },
+
+  isClickable: function(elem){
+    if (elem.tagName == 'BUTTON' || elem.tagName == 'A'){return true;}
+    else if (elem.tagName == 'INPUT' && _.contains(['submit', 'button', 'checkbox', 'radio'], elem.type.toLowerCase())){
+      return true;
+    }
+    return false;
   }
 }
 
@@ -160,8 +168,8 @@ function elementToFeatureVector(elem) {
       // 0 = top of page, 1 = at fold
       relative_y: ((rect.top +  window.scrollY) / window.innerHeight),
 
-      clickable: _.contains(CLICKABLE_TAGS, elem.tagName) ? 1:-1,
-      typeable: _.contains(TYPEABLE_TAGS, elem.tagName) ? 1:-1,
+      clickable: Features.isClickable(elem)? 1:-1,
+      typeable: Features.isTypable(elem)? 1:-1,
 
       tagname: elem.tagName,
       text_words: Features.getTextWords(elem),
