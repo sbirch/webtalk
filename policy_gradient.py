@@ -77,12 +77,14 @@ def reward_gold_standard(history):
         ('click', 'continue')
     ]
 
+    reward = len(history)
+
     for i, (state, action, best_score) in enumerate(history):
         gold = correct[i]
         if action.type != gold[0] or action.element.get_attribute('x-wtid') != gold[1] or (action.type == 'type' and action.params != gold[2]):
-            return -1
+            reward -= 1
 
-    return 1
+    return reward / len(history)
 
 
 def reward_branavan(history):
