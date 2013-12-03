@@ -78,9 +78,12 @@ def reward_gold_standard(history):
         right_element = action.element.get_attribute('x-wtid') == gold_wtid
         right_text = gold_text != None and action.params == gold_text
 
-        score = sum([1 for b in [right_type, right_element, right_text] if b])
-
-        reward += score/3.0
+        if right_type and right_element and right_text:
+            reward += 1
+        elif right_type and right_element and not right_text:
+            reward += 0.5
+        else:
+            reward -= 1
 
 
     return reward / len(history)
