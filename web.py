@@ -144,7 +144,7 @@ def extend_and_norm_feature(element, feature, command, num_elems):
 
     w,h = feature['width'], feature['height']
     mx, my, sx, sy = 54.611, 25.206, 43.973, 6.467
-    feature['button_model'] = 1e4 * (stats.norm.cdf(h+1, loc=my, scale=sy) - stats.norm.cdf(h, loc=my, scale=sy)) * (stats.norm.cdf(w+1, loc=mx, scale=sx) - stats.norm.cdf(w, loc=mx, scale=sx))
+    feature['button_model'] = (stats.norm.cdf(h+1, loc=my, scale=sy) - stats.norm.cdf(h, loc=my, scale=sy)) * (stats.norm.cdf(w+1, loc=mx, scale=sx) - stats.norm.cdf(w, loc=mx, scale=sx))
 
 
     # relative x and y can  be more than 1 because things can be beyond the edge of the window
