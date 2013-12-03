@@ -168,10 +168,16 @@ def likelihood_and_marginal(w, h):
 
 def extend_and_norm_feature(element, feature, command, num_elems):
     feature['element'] = element
+    
+    #feature['tagname_edit'] = str_util.get_normed_dist_for_words(command, [feature['tagname']])
+    #feature['text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['text_words'])
+    #feature['sibling_text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['sibling_text_words'])
+    
+    feature['tagname_edit'] = str_util.get_mean_distance_of_words(command, [feature['tagname']])
+    feature['text_words_edit'] = str_util.get_mean_distance_of_words(command, feature['text_words'])
+    feature['sibling_text_words_edit'] = str_util.get_mean_distance_of_words(command, feature['sibling_text_words'])
 
-    feature['tagname_edit'] = str_util.get_normed_dist_for_words(command, [feature['tagname']])
-    feature['text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['text_words'])
-    feature['sibling_text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['sibling_text_words'])
+
     feature['n_children'] = 1 - float(feature['n_children']) / num_elems
 
     w,h = feature['width'], feature['height']
