@@ -4,7 +4,7 @@ import random
 import time
 import util.str_util as str_util
 
-ITERATIONS = 5
+ITERATIONS = 50
 
 # takes in a list of lists of commands which should be executed in order
 def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
@@ -51,14 +51,15 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
                 gradient = np.add(gradient, np.subtract(phi_t, weighted_actions))
 
             # STEP 5
-            r = reward(state_actions)
+            r = reward_branavan(state_actions)
+            print r
 
             theta = np.add(theta, np.multiply(r, gradient))
     driver.quit()
     return theta
 
 def reward_branavan(history):
-    
+
     sentence_rewards = []
 
     for state, action, best_score in history:
@@ -84,7 +85,7 @@ def reward(history):
 
 if __name__ == "__main__":
     docs = [["click search"]]
-    for i in range(10):
+    for i in range(1):
         res = policy_gradient(docs)
         print "Result theta: "
         print res
