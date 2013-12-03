@@ -104,7 +104,7 @@ var Features = {
 
   // return a list of filtered words from the text of an element
   getTextWords: function(elem) {
-    return filter_word_list(elem.textContent.split(" "));
+    return filter_word_list(elem.textContent.split(/\s+/));
   },
 
   // produces a list of filtered words in text 
