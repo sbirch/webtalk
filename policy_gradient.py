@@ -66,15 +66,22 @@ def reward_gold_standard(history):
         ('type', 'firstname', 'Andrew'),
         ('type', 'lastname', 'Kovacs'),
         ('type', 'mailbox', '1337'),
-        ('click', 'continue')
+        ('click', 'continue', None)
     ]
 
-    reward = len(history)
+    reward = 0
 
     for i, (state, action, best_score) in enumerate(history):
-        gold = correct[i]
-        if action.type != gold[0] or action.element.get_attribute('x-wtid') != gold[1] or (action.type == 'type' and action.params != gold[2]):
-            reward -= 1
+        gold_type, gold_wtid, gold_text = correct[i]
+
+        right_type = action.type == gold_type
+        right_element = action.element.get_attribute('x-wtid') == gold_wtid
+        right_text = gold_text != None and action.params == gold_text
+
+        score = [1 for b in [right_type, right_element, right_text] if b]
+
+        reward += score/3.0
+
 
     return reward / len(history)
 
