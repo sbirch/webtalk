@@ -4,16 +4,16 @@ import random
 import time
 import util.str_util as str_util
 
-ITERATIONS = 50
+ITERATIONS = 100
 
 # takes in a list of lists of commands which should be executed in order
 def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
     theta = np.zeros(len(web.Action.FEATURE_NAMES))
     #for i in range(len(web.Action.FEATURE_NAMES)):
-    #    theta[i] = random.random()
+    #    theta[i] = random.randint(0,10)
+
 
     driver = web.start("http://www.hipmunk.com/flights-search")
-
     for i in range(ITERATIONS):
         for doc_num, document in enumerate(command_documents):
             state_actions = []
@@ -27,7 +27,7 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
                 actions = state.enumerate_actions()
                 action, best_score, probs = state.get_action_probs(actions, theta)
 
-                print "Performing... %" , action
+                print "Performing... % for %" , action, document[t]
                 action.perform(driver, True)
 
                 state_actions.append((
@@ -52,14 +52,13 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
 
             # STEP 5
             r = reward_branavan(state_actions)
-            print r
+            print "Reward: %", r
 
             theta = np.add(theta, np.multiply(r, gradient))
     driver.quit()
     return theta
 
 def reward_branavan(history):
-
     sentence_rewards = []
 
     for state, action, best_score in history:
@@ -84,7 +83,7 @@ def reward(history):
     return random.randint(0,10)
 
 if __name__ == "__main__":
-    docs = [["click search"]]
+    docs = [["type providence into from box", "type new york into to box", "click search"]]
     for i in range(1):
         res = policy_gradient(docs)
         print "Result theta: "

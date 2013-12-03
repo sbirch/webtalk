@@ -5,7 +5,7 @@ import uuid
 
 def get_driver():
     driver = webdriver.Chrome(executable_path="./chromedriver")
-    #driver = webdriver.phantomjs.webdriver.WebDriver()
+   # driver = webdriver.phantomjs.webdriver.WebDriver()
     driver.set_window_size(1400, 900)
     driver.set_window_position(200, 50)
 
