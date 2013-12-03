@@ -138,10 +138,7 @@ def start(url):
 ELEMENT_DATA = json.load(open('element_sizes.json', 'rb'))
 
 BUTTON_SIZE_KDE = stats.gaussian_kde(numpy.transpose(numpy.array(
-    # n.b. buttons over 400px are filtered out, as they mess up the model.
-    # this is moral because the button determiner is merely an automated
-    # approximation of gold standard button determination.
-    [x[1:] for x in ELEMENT_DATA if x[0] and x[1] < 400]
+    [x[1:] for x in ELEMENT_DATA if x[0]]
 )))
 
 ELEMENT_SIZE_KDE = stats.gaussian_kde(numpy.transpose(numpy.array(
@@ -161,7 +158,7 @@ def extend_and_norm_feature(element, feature, command, num_elems):
 
     #likelihood_button = (stats.norm.cdf(h+1, loc=my, scale=sy) - stats.norm.cdf(h, loc=my, scale=sy)) * (stats.norm.cdf(w+1, loc=mx, scale=sx) - stats.norm.cdf(w, loc=mx, scale=sx))
     likelihood_button = BUTTON_SIZE_KDE.integrate_box([w,h], [w+1,h+1])
-    prior = 0.01562
+    prior = 0.02
     marginal = ELEMENT_SIZE_KDE.integrate_box([w,h], [w+1,h+1])
 
     feature['button_model'] = (likelihood_button * prior) / marginal
