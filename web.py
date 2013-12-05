@@ -45,7 +45,8 @@ class Action:
         'single_subword',
         'double_subword',
         'big_subword',
-        'contains_action_word'
+        'contains_action_word',
+        'contains_stop_word'
     ]
 
     def __init__(self, element, atype, features, params=None):
@@ -187,6 +188,9 @@ def extend_subword_features(feature, subwords, command):
 
     action_words = 'press hit click type enter put'.split(' ')
     feature['contains_action_word'] = 1 if any([w.lower() in action_words for w in subwords]) else 0
+
+    stop_words = 'the in as for to'.split(' ')
+    feature['contains_stop_word'] = 1 if any([w.lower() in stop_words for w in subwords]) else 0
 
     return feature
 
