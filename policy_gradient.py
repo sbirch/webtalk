@@ -7,7 +7,7 @@ import copy
 from matplotlib import pyplot as plt
 from data import gen_docs
 
-ITERATIONS = 5
+ITERATIONS = 4
 
 # takes in a list of lists of commands which should be executed in order
 def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=True):
@@ -16,6 +16,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
         theta[i] = random.random()
 
     theta_history = [copy.copy(theta)]
+    reward_history = []
 
     driver = web.start(start_url)
     try:
@@ -63,15 +64,18 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                 r = reward_gold_standard(state_actions, document)
                 print "Reward: %", r
 
+                reward_history.append(r)
+
                 theta = np.add(theta, np.multiply(r, gradient))
                 theta_history.append(copy.copy(theta))
     finally:
         driver.quit()
 
     if visualize:
-        plt.legend(web.Action.FEATURE_NAMES)
+        plt.plot(reward_history, 'o')
         for i in range(len(web.Action.FEATURE_NAMES)):
             plt.plot([x[i] for x in theta_history])
+        plt.legend(['reward'] + web.Action.FEATURE_NAMES)
         plt.show()
 
     return theta

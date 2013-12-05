@@ -36,7 +36,7 @@ class Action:
         'typeable',
         #'clickable',
         #'text_size',
-        'has_id',
+        #'has_id',
         'has_class',
         'button_model',
         #'relative_x',
@@ -44,9 +44,9 @@ class Action:
         'alreadyInteracted',
         'single_subword',
         'double_subword',
-        'big_subword',
+        #'big_subword',
         'contains_action_word',
-        'contains_stop_word'
+        #'contains_stop_word'
     ]
 
     def __init__(self, element, atype, features, params=None):
