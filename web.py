@@ -44,7 +44,8 @@ class Action:
         'alreadyInteracted',
         'single_subword',
         'double_subword',
-        'big_subword'
+        'big_subword',
+        'contains_action_word'
     ]
 
     def __init__(self, element, atype, features, params=None):
@@ -180,9 +181,12 @@ def likelihood_and_marginal(w, h):
 def extend_subword_features(feature, subwords, command):
     if subwords is None:
         subwords = []
-    feature['single_subword'] = len(subwords) == 1
-    feature['double_subword'] = len(subwords) == 2
-    feature['big_subword'] = len(subwords) > 2
+    feature['single_subword'] = 1 if len(subwords) == 1 else 0
+    feature['double_subword'] = 1 if len(subwords) == 2 else 0
+    feature['big_subword'] = 1 if len(subwords) > 2 else 0
+
+    action_words = 'press hit click type enter put'.split(' ')
+    feature['contains_action_word'] = 1 if any([w.lower() in action_words for w in subwords]) else 0
 
     return feature
 
