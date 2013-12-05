@@ -3,14 +3,18 @@ import web
 import random
 import time
 import util.str_util as str_util
+import copy
+import matplotlib
 
 ITERATIONS = 50
 
 # takes in a list of lists of commands which should be executed in order
-def policy_gradient(command_documents, start_url = "http://localhost:8000"):
+def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=True):
     theta = np.zeros(len(web.Action.FEATURE_NAMES))
     for i in range(len(web.Action.FEATURE_NAMES)):
         theta[i] = 1
+
+    theta_history = [copy.copy(theta)]
 
     driver = web.start(start_url)
 
@@ -60,8 +64,16 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000"):
                 print "Reward: %", r
 
                 theta = np.add(theta, np.multiply(r, gradient))
+                theta_history.append(copy.copy(theta))
     finally:
         driver.quit()
+
+    if visualize:
+        plt.legend(web.Action.FEATURE_NAMES)
+        for i in range(len(web.Action.FEATURE_NAMES)):
+            plt.plot([x[i] for x in theta_history])
+        plt.show()
+
     return theta
 
 def reward_gold_standard(history, perfect=1, ok=0.5, bad=-1):
