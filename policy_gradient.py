@@ -13,52 +13,55 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000"):
         theta[i] = 1
 
     driver = web.start(start_url)
-    for i in range(ITERATIONS):
-        driver.get(start_url)
-        for doc_num, document in enumerate(command_documents):
-            state_actions = []
-            action_choices = []
 
-            # STEP 3
-            for t in range(len(document)):
-                state = web.build_state(driver, web.tokenize_command(document[t]))
+    try:
+        for i in range(ITERATIONS):
+            driver.get(start_url)
+            for doc_num, document in enumerate(command_documents):
+                state_actions = []
+                action_choices = []
 
-                actions = state.enumerate_actions()
-                assert len(actions) > 0 # If the actions list is empty there will be errors later on. (Perhaps the page failed to load?)
+                # STEP 3
+                for t in range(len(document)):
+                    state = web.build_state(driver, web.tokenize_command(document[t]))
 
-                action, best_score, probs = state.get_action_probs(actions, theta)
+                    actions = state.enumerate_actions()
+                    assert len(actions) > 0 # If the actions list is empty there will be errors later on. (Perhaps the page failed to load?)
 
-                state.phi_dot_theta(action, theta, verbose=True)
+                    action, best_score, probs = state.get_action_probs(actions, theta)
 
-                print "Performing... %r for %r" % (action, document[t])
-                action.perform(driver, dry=True)
+                    state.phi_dot_theta(action, theta, verbose=True)
 
-                state_actions.append((
-                    state,
-                    action,
-                    best_score
-                ))
-                action_choices.append(probs)
+                    print "Performing... %r for %r" % (action, document[t])
+                    action.perform(driver, dry=True)
 
-            gradient = np.zeros(len(web.Action.FEATURE_NAMES))
-            for t in range(len(document)):
-                phi_t = actions[t].as_numeric_vector()
+                    state_actions.append((
+                        state,
+                        action,
+                        best_score
+                    ))
+                    action_choices.append(probs)
 
-                # STEP 4
-                weighted_actions = np.zeros(len(web.Action.FEATURE_NAMES))
-                for action in action_choices[t]:
-                    prob_action = action_choices[t][action]
-                    weighted_actions = np.add(weighted_actions, \
-                              np.multiply(action.as_numeric_vector(), prob_action))
+                gradient = np.zeros(len(web.Action.FEATURE_NAMES))
+                for t in range(len(document)):
+                    phi_t = actions[t].as_numeric_vector()
 
-                gradient = np.add(gradient, np.subtract(phi_t, weighted_actions))
+                    # STEP 4
+                    weighted_actions = np.zeros(len(web.Action.FEATURE_NAMES))
+                    for action in action_choices[t]:
+                        prob_action = action_choices[t][action]
+                        weighted_actions = np.add(weighted_actions, \
+                                  np.multiply(action.as_numeric_vector(), prob_action))
 
-            # STEP 5
-            r = reward_gold_standard(state_actions)
-            print "Reward: %", r
+                    gradient = np.add(gradient, np.subtract(phi_t, weighted_actions))
 
-            theta = np.add(theta, np.multiply(r, gradient))
-    driver.quit()
+                # STEP 5
+                r = reward_gold_standard(state_actions)
+                print "Reward: %", r
+
+                theta = np.add(theta, np.multiply(r, gradient))
+    finally:
+        driver.quit()
     return theta
 
 def reward_gold_standard(history, perfect=1, ok=0.5, bad=-1):
@@ -123,8 +126,7 @@ if __name__ == "__main__":
         "Click submit"]]
     for i in range(1):
         res = policy_gradient(docs)
-        print "Result theta: "
-        print res
+        print "Result theta:", res
         print
 
 

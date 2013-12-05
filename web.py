@@ -219,10 +219,6 @@ def extend_and_norm_feature(element, feature, command, num_elems):
 def extract(driver, command):
     driver.execute_script(open(UNDERSCORE_JS).read())
     features, tree = driver.execute_script(open(GET_FEATURES_JS).read())
-    print tree
-    for f in features:
-        print f[1]['tagname']
-    print
     features = [extend_and_norm_feature(f[0], f[1], command, len(features)) for f in features]
 
     return features, tree
