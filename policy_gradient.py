@@ -4,7 +4,7 @@ import random
 import time
 import util.str_util as str_util
 import copy
-import matplotlib
+from matplotlib import pyplot as plt
 from data import gen_docs
 
 ITERATIONS = 5
