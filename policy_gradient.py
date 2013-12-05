@@ -4,13 +4,13 @@ import random
 import time
 import util.str_util as str_util
 import copy
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 from data import gen_docs
 
 ITERATIONS = 5
 
 # takes in a list of lists of commands which should be executed in order
-def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=True):
+def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=False):
     theta = np.zeros(len(web.Action.FEATURE_NAMES))
     for i in range(len(web.Action.FEATURE_NAMES)):
         theta[i] = random.random()

@@ -105,7 +105,7 @@ var Features = {
   // return a list of filtered words from the text of an element
   getTextWords: function(elem) {
 	var words = []
-	if (elem.value && elem.type.toLowerCase() === "button") words.push(elem.value);
+	if (elem.value && this.isClickable(elem)) words.push(elem.value);
 	if (elem.alt) words.push(elem.alt);
     return filter_word_list(elem.textContent.split(/\s+/).concat(words));
   },

@@ -34,7 +34,7 @@ class Action:
         'sibling_text_words_edit',
         'tagname_edit',
         'typeable',
-        #'clickable',
+        'clickable',
         #'text_size',
         'has_id',
         'has_class',
@@ -122,6 +122,7 @@ class State:
         if verbose:
             print 'Product:'
             print np.dot(phi, theta)
+            print action.features['text_words']
             print action.features['sibling_text_words']
             for i,f in enumerate(Action.FEATURE_NAMES):
                 print '\t%+.4f\t%s\t%.4f * %.4f' % (phi[i]*theta[i], f, phi[i], theta[i])
