@@ -61,7 +61,7 @@ def policy_gradient(command_documents, start_url = "http://www.hipmunk.com"):
     driver.quit()
     return theta
 
-def reward_gold_standard(history):
+def reward_gold_standard(history, perfect=1, ok=0.5, bad=-1):
     correct = [
         ('type', 'firstname', 'Andrew'),
         ('type', 'lastname', 'Kovacs'),
@@ -79,11 +79,11 @@ def reward_gold_standard(history):
         right_text = gold_text != None and action.params == gold_text
 
         if right_type and right_element and right_text:
-            reward += 1
+            reward += perfect
         elif right_type and right_element and not right_text:
-            reward += 0.5
+            reward += ok
         else:
-            reward -= 1
+            reward += bad
 
 
     return reward / len(history)
