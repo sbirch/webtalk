@@ -60,7 +60,7 @@ class Action:
             elem.setAttribute("x-WebtalkInteracted", "1")
             ''', self.element)
 
-        if dry:
+        if dry and self.type=='click':
             seutil.highlight(driver, self.element, opacity=0.5)
             return
 
@@ -188,11 +188,11 @@ def extend_subword_features(feature, subwords, command):
 
 def extend_and_norm_feature(element, feature, command, num_elems):
     feature['element'] = element
-    
+
     #feature['tagname_edit'] = str_util.get_normed_dist_for_words(command, [feature['tagname']])
     #feature['text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['text_words'])
     #feature['sibling_text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['sibling_text_words'])
-    
+
     feature['tagname_edit'] = str_util.get_mean_distance_of_words(command, [feature['tagname']])
     feature['text_words_edit'] = str_util.get_mean_distance_of_words(command, feature['text_words'])
     feature['sibling_text_words_edit'] = str_util.get_mean_distance_of_words(command, feature['sibling_text_words'])
