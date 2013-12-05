@@ -5,7 +5,7 @@ import time
 import util.str_util as str_util
 from data import gen_docs
 
-ITERATIONS = 50
+ITERATIONS = 5
 
 # takes in a list of lists of commands which should be executed in order
 def policy_gradient(command_documents, start_url = "http://localhost:8000"):
@@ -14,60 +14,54 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000"):
         theta[i] = 1
 
     driver = web.start(start_url)
-    for i in range(ITERATIONS):
-        driver.get(start_url)
-        for doc_num, document in enumerate(command_documents):
-            state_actions = []
-            action_choices = []
+    try:
+        for i in range(ITERATIONS):
+            driver.get(start_url)
+            for doc_num, document in enumerate(command_documents):
+                state_actions = []
+                action_choices = []
 
-            # STEP 3
-            for t in range(len(document)):
-                annotated_cmd = document[t]
-                state = web.build_state(driver, web.tokenize_command(annotated_cmd[0]))
+                # STEP 3
+                for t in range(len(document)):
+                    annotated_cmd = document[t]
+                    state = web.build_state(driver, web.tokenize_command(annotated_cmd[0]))
 
-                actions = state.enumerate_actions()
-                assert len(actions) > 0 # If the actions list is empty there will be errors later on. (Perhaps the page failed to load?)
-                for a in actions:
-                    if a.type == "click":
-                        print a
-                        state.phi_dot_theta(a, theta, verbose=True)
-                        print
-                        print
-                return
+                    actions = state.enumerate_actions()
 
-                action, best_score, probs = state.get_action_probs(actions, theta)
+                    action, best_score, probs = state.get_action_probs(actions, theta)
 
-                state.phi_dot_theta(action, theta, verbose=True)
+                    state.phi_dot_theta(action, theta, verbose=True)
 
-                print "Performing... %r for %r" % (action, annotated_cmd[0])
-                action.perform(driver, dry=True)
+                    print "Performing... %r for %r" % (action, annotated_cmd[0])
+                    action.perform(driver)
 
-                state_actions.append((
-                    state,
-                    action,
-                    best_score
-                ))
-                action_choices.append(probs)
+                    state_actions.append((
+                        state,
+                        action,
+                        best_score
+                    ))
+                    action_choices.append(probs)
 
-            gradient = np.zeros(len(web.Action.FEATURE_NAMES))
-            for t in range(len(document)):
-                phi_t = actions[t].as_numeric_vector()
+                gradient = np.zeros(len(web.Action.FEATURE_NAMES))
+                for t in range(len(document)):
+                    phi_t = actions[t].as_numeric_vector()
 
-                # STEP 4
-                weighted_actions = np.zeros(len(web.Action.FEATURE_NAMES))
-                for action in action_choices[t]:
-                    prob_action = action_choices[t][action]
-                    weighted_actions = np.add(weighted_actions, \
-                              np.multiply(action.as_numeric_vector(), prob_action))
+                    # STEP 4
+                    weighted_actions = np.zeros(len(web.Action.FEATURE_NAMES))
+                    for action in action_choices[t]:
+                        prob_action = action_choices[t][action]
+                        weighted_actions = np.add(weighted_actions, \
+                                  np.multiply(action.as_numeric_vector(), prob_action))
 
-                gradient = np.add(gradient, np.subtract(phi_t, weighted_actions))
+                    gradient = np.add(gradient, np.subtract(phi_t, weighted_actions))
 
-            # STEP 5
-            r = reward_gold_standard(state_actions, document[t])
-            print "Reward: %", r
+                # STEP 5
+                r = reward_gold_standard(state_actions, document)
+                print "Reward: %", r
 
-            theta = np.add(theta, np.multiply(r, gradient))
-    driver.quit()
+                theta = np.add(theta, np.multiply(r, gradient))
+    finally:
+        driver.quit()
     return theta
 
 def reward_gold_standard(history, document, perfect=1, ok=0.5, bad=-1):
@@ -121,8 +115,7 @@ if __name__ == "__main__":
     docs = gen_docs.get_all_docs()
     for i in range(1):
         res = policy_gradient(docs)
-        print "Result theta: "
-        print res
+        print "Result theta:", res
         print
 
 

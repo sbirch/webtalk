@@ -1,10 +1,15 @@
 import numpy as np
 import web
+import policy_gradient
+from data import gen_docs
+
+docs = gen_docs.get_all_docs()
+
+theta_of_all_thetas = [0.17334518, 0.90195079, 0.42518274, 0.72998457,\
+        0.56155784, 0.2100886, 0.73153149, 0.20276437, 0.0031535, 0.21628661]
+theta = policy_gradient.policy_gradient(docs)
 
 start_url = "http://localhost:8000"
-theta = np.zeros(len(web.Action.FEATURE_NAMES))
-for i in range(len(web.Action.FEATURE_NAMES)):
-    theta[i] = 1
 
 
 
@@ -18,6 +23,8 @@ while cmd != "QUIT":
     actions = state.enumerate_actions()
 
     action, best_score, probs = state.get_action_probs(actions, theta)
+
+    state.phi_dot_theta(action, theta, True)
 
     action.perform(driver)
 

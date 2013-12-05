@@ -108,7 +108,9 @@ class State:
                     _el = extend_subword_features(_el, subwords, self.command)
                     actions.append(Action(_el['element'], 'type', _el, params=subwords))
             else:
-                actions.append(Action(el['element'], 'click', el))
+                _el = copy.copy(el)
+                _el = extend_subword_features(_el, None, self.command)
+                actions.append(Action(_el['element'], 'click', _el))
         return actions
 
     def phi_dot_theta(self, action, theta, verbose=False):
@@ -176,6 +178,8 @@ def likelihood_and_marginal(w, h):
     return _LandH_cache[(w,h)]
 
 def extend_subword_features(feature, subwords, command):
+    if subwords is None:
+        subwords = []
     feature['single_subword'] = len(subwords) == 1
     feature['double_subword'] = len(subwords) == 2
     feature['big_subword'] = len(subwords) > 2
@@ -219,10 +223,6 @@ def extend_and_norm_feature(element, feature, command, num_elems):
 def extract(driver, command):
     driver.execute_script(open(UNDERSCORE_JS).read())
     features, tree = driver.execute_script(open(GET_FEATURES_JS).read())
-    print tree
-    for f in features:
-        print f[1]['tagname']
-    print
     features = [extend_and_norm_feature(f[0], f[1], command, len(features)) for f in features]
 
     return features, tree
