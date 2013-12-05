@@ -5,38 +5,38 @@ import time
 import util.str_util as str_util
 import copy
 import matplotlib
+from data import gen_docs
 
-ITERATIONS = 50
+ITERATIONS = 5
 
 # takes in a list of lists of commands which should be executed in order
 def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=True):
     theta = np.zeros(len(web.Action.FEATURE_NAMES))
     for i in range(len(web.Action.FEATURE_NAMES)):
-        theta[i] = 1
+        theta[i] = random.random()
 
     theta_history = [copy.copy(theta)]
 
     driver = web.start(start_url)
-
     try:
         for i in range(ITERATIONS):
-            driver.get(start_url)
             for doc_num, document in enumerate(command_documents):
+                driver.get(start_url)
                 state_actions = []
                 action_choices = []
 
                 # STEP 3
                 for t in range(len(document)):
-                    state = web.build_state(driver, web.tokenize_command(document[t]))
+                    annotated_cmd = document[t]
+                    state = web.build_state(driver, web.tokenize_command(annotated_cmd[0]))
 
                     actions = state.enumerate_actions()
-                    assert len(actions) > 0 # If the actions list is empty there will be errors later on. (Perhaps the page failed to load?)
 
                     action, best_score, probs = state.get_action_probs(actions, theta)
 
                     state.phi_dot_theta(action, theta, verbose=True)
 
-                    print "Performing... %r for %r" % (action, document[t])
+                    print "Performing... %r for %r" % (action, annotated_cmd[0])
                     action.perform(driver, dry=True)
 
                     state_actions.append((
@@ -60,7 +60,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                     gradient = np.add(gradient, np.subtract(phi_t, weighted_actions))
 
                 # STEP 5
-                r = reward_gold_standard(state_actions)
+                r = reward_gold_standard(state_actions, document)
                 print "Reward: %", r
 
                 theta = np.add(theta, np.multiply(r, gradient))
@@ -76,13 +76,8 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
     return theta
 
-def reward_gold_standard(history, perfect=1, ok=0.5, bad=-1):
-    correct = [
-        ('type', 'firstname', 'Andrew'),
-        ('type', 'lastname', 'Kovacs'),
-        ('type', 'mailbox', '1337'),
-        ('click', 'continue', None)
-    ]
+def reward_gold_standard(history, document, perfect=1, ok=0.5, bad=-1):
+    correct = [command[1] for command in document]
 
     reward = 0
 
@@ -129,13 +124,7 @@ def reward(history):
     return random.randint(0,10)
 
 if __name__ == "__main__":
-    #docs = [["type providence into from box", "type new york into to box", "click search"]]
-    docs = [[" Enter Andrew in first name box",
-        "Enter Kovacs for last name",
-        "Enter 1337 as box number",
-        "Press continue",
-        "Click flowers",
-        "Click submit"]]
+    docs = gen_docs.get_all_docs()
     for i in range(1):
         res = policy_gradient(docs)
         print "Result theta:", res

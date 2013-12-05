@@ -4,7 +4,7 @@ from collections import defaultdict
 # semantic representation
 def get_all_docs():
     commands = defaultdict(list)
-    for l in open("sendacard_corpus.tsv"):
+    for l in open("data/sendacard_corpus.tsv"):
         split_line = l.split("\t")
 
         n = int(split_line[0])
@@ -25,7 +25,7 @@ def get_all_docs():
 
 
     def rec_gendocs(step_num = 1, doc_so_far = []):
-        if step_num == len(commands):
+        if step_num == 5:
             all_docs.append(doc_so_far)
 
         for command in commands[step_num]:
@@ -36,10 +36,6 @@ def get_all_docs():
     rec_gendocs()
     return all_docs
 
-for doc in get_all_docs():
-    for l in doc:
-        print l
-    print
 
 
 
