@@ -20,19 +20,11 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000"):
             action_choices = []
 
             # STEP 3
-            print document
             for t in range(len(document)):
                 state = web.build_state(driver, web.tokenize_command(document[t]))
 
                 actions = state.enumerate_actions()
                 assert len(actions) > 0 # If the actions list is empty there will be errors later on. (Perhaps the page failed to load?)
-                for a in actions:
-                    if a.type == "click":
-                        print a
-                        state.phi_dot_theta(a, theta, verbose=True)
-                        print
-                        print
-                return
 
                 action, best_score, probs = state.get_action_probs(actions, theta)
 
