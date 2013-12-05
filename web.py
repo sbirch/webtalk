@@ -99,7 +99,6 @@ class State:
         actions = []
         for el in self.features:
             if el['typeable'] == 1:
-                actions.append(Action(el['element'], 'click', el)) # DELETE ME
                 for subwords in self._subcommands():
                     actions.append(Action(el['element'], 'type', el, params=subwords))
             else:
