@@ -10,6 +10,7 @@ import math
 import scipy.stats as stats
 import numpy as np
 import json
+import copy
 
 GET_FEATURES_JS = "js/get-features.js"
 UNDERSCORE_JS = "js/underscore.js"
@@ -41,6 +42,9 @@ class Action:
         #'relative_x',
         #'relative_y',
         'alreadyInteracted',
+        'single_subword',
+        'double_subword',
+        'big_subword'
     ]
 
     def __init__(self, element, atype, features, params=None):
@@ -99,9 +103,10 @@ class State:
         actions = []
         for el in self.features:
             if el['typeable'] == 1:
-                actions.append(Action(el['element'], 'click', el)) # DELETE ME
                 for subwords in self._subcommands():
-                    actions.append(Action(el['element'], 'type', el, params=subwords))
+                    _el = copy.copy(el)
+                    _el = extend_subword_features(_el, subwords, self.command)
+                    actions.append(Action(_el['element'], 'type', _el, params=subwords))
             else:
                 actions.append(Action(el['element'], 'click', el))
         return actions
@@ -169,6 +174,13 @@ def likelihood_and_marginal(w, h):
         ELEMENT_SIZE_KDE.integrate_box([w,h], [w+1,h+1])
     )
     return _LandH_cache[(w,h)]
+
+def extend_subword_features(feature, subwords, command):
+    feature['single_subword'] = len(subwords) == 1
+    feature['double_subword'] = len(subwords) == 2
+    feature['big_subword'] = len(subwords) > 2
+
+    return feature
 
 def extend_and_norm_feature(element, feature, command, num_elems):
     feature['element'] = element
