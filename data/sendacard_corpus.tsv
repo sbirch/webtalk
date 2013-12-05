@@ -1,39 +1,42 @@
-1	Enter Andrew in first name box
-1	Enter Sam as first name
-1	Enter Stefanie in first name
-1	Type Andrew for first name
-1	Put Sam in the first name field
-1	Type Sam in the first name box
-2	Enter Kovacs for last name 
-2	Enter Birch in last name text field
-2	Enter Tellex in last name box 
-2	Enter Tellex in last name field
-2	Type Kovacs for last name
-2	Enter Birch in the last name field
-2	Type Tellex in the last name thingy
-3	Enter 5279 in box number
-3	Enter 1337 as box number
-3	Enter 1353 in the box number box
-3	Type 1336 for the box number
-3	Type 2352 in the box number field
-3	Enter 3582 for the box number
-3	Enter box 3253
-3	Type box 3252
-3	Enter the box number 3252
-4	Click continue
-4	Press continue
-4	Hit continue
-4	Press the continue button
-4	Click the continue button
-5	Click chocolates
-5	Send chocolates
-5	Press the chocolates button
-5	Click the chocolates link
-5	Click flowers
-5	Press the flowers link
-5	Click the flowers button
-5	Send a card
-5	Click the card link
-5	Press card
-5	Press the button to send a card
-
+1	Enter Andrew in first name box	type	firstname	Andrew
+1	Enter Sam as first name	type	firstname	Sam
+1	Enter Stefanie in first name	type	firstname	Stefanie
+1	Type Andrew for first name	type	firstname	Andrew
+1	Put Sam in the first name field	type	firstname	Sam
+1	Type Sam in the first name box	type	firstname	Sam
+2	Enter Kovacs for last name 	type	lastname	Kovacs
+2	Enter Birch in last name text field 	type	lastname	Birch
+2	Enter Tellex in last name box 	type	lastname	Tellex
+2	Enter Tellex in last name field 	type	lastname	Tellex
+2	Type Kovacs for last name 	type	lastname	Kovacs
+2	Enter Birch in the last name field 	type	lastname	Birch
+2	Type Tellex in the last name thingy	type	lastname	Tellex
+3	Enter 5279 in box number	type	mailbox	5279
+3	Enter 1337 as box number	type	mailbox	1337
+3	Enter 1353 in the box number box	type	mailbox	1353
+3	Type 1336 for the box number	type	mailbox	1336
+3	Type 2352 in the box number field	type	mailbox	2352
+3	Enter 3582 for the box number	type	mailbox	3582
+3	Enter box 3253	type	mailbox	3253
+3	Type box 3252	type	mailbox	3252
+3	Enter the box number 3252	type	mailbox	3252
+4	Click continue	click	continue	None
+4	Press continue	click	continue	None
+4	Hit continue	click	continue	None
+4	Press the continue button	click	continue	None
+4	Click the continue button	click	continue	None
+5	Click chocolates	click	chocolates	None
+5	Send chocolates	click	chocolates	None
+5	Press the chocolates button	click	chocolates	None
+5	Click the chocolates link	click	chocolates	None
+5	Click flowers	click	flowers	None
+5	Press the flowers link	click	flowers	None
+5	Click the flowers button	click	flowers	None
+5	Send a card	click	card	None
+5	Click the card link	click	card	None
+5	Press card	click	card	None
+5	Press the button to send a card	click	card	None
+6	Click submit	click	submit	None
+6	Press submit	click	submit	None
+6	Submit	click	submit	None
+6	Press the submit button	click	submit	None
