@@ -34,6 +34,14 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
                     action, best_score, probs = state.get_action_probs(actions, theta)
 
+                    r = random.random()
+                    acc_prob = 0
+                    for a in probs:
+                        acc_prob += probs[a]
+                        if acc_prob > r:
+                            action = a
+                            break
+
                     state.phi_dot_theta(action, theta, verbose=True)
 
                     print "Performing... %r for %r" % (action, annotated_cmd[0])
