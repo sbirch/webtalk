@@ -3,6 +3,7 @@ import web
 import random
 import time
 import util.str_util as str_util
+from data import gen_docs
 
 ITERATIONS = 50
 
@@ -20,9 +21,9 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000"):
             action_choices = []
 
             # STEP 3
-            print document
             for t in range(len(document)):
-                state = web.build_state(driver, web.tokenize_command(document[t]))
+                annotated_cmd = document[t]
+                state = web.build_state(driver, web.tokenize_command(annotated_cmd[0]))
 
                 actions = state.enumerate_actions()
                 assert len(actions) > 0 # If the actions list is empty there will be errors later on. (Perhaps the page failed to load?)
@@ -38,7 +39,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000"):
 
                 state.phi_dot_theta(action, theta, verbose=True)
 
-                print "Performing... %r for %r" % (action, document[t])
+                print "Performing... %r for %r" % (action, annotated_cmd[0])
                 action.perform(driver, dry=True)
 
                 state_actions.append((
@@ -62,20 +63,15 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000"):
                 gradient = np.add(gradient, np.subtract(phi_t, weighted_actions))
 
             # STEP 5
-            r = reward_gold_standard(state_actions)
+            r = reward_gold_standard(state_actions, document[t])
             print "Reward: %", r
 
             theta = np.add(theta, np.multiply(r, gradient))
     driver.quit()
     return theta
 
-def reward_gold_standard(history, perfect=1, ok=0.5, bad=-1):
-    correct = [
-        ('type', 'firstname', 'Andrew'),
-        ('type', 'lastname', 'Kovacs'),
-        ('type', 'mailbox', '1337'),
-        ('click', 'continue', None)
-    ]
+def reward_gold_standard(history, document, perfect=1, ok=0.5, bad=-1):
+    correct = [command[1] for command in document]
 
     reward = 0
 
@@ -122,13 +118,7 @@ def reward(history):
     return random.randint(0,10)
 
 if __name__ == "__main__":
-    #docs = [["type providence into from box", "type new york into to box", "click search"]]
-    docs = [[" Enter Andrew in first name box",
-        "Enter Kovacs for last name",
-        "Enter 1337 as box number",
-        "Press continue",
-        "Click flowers",
-        "Click submit"]]
+    docs = gen_docs.get_all_docs()
     for i in range(1):
         res = policy_gradient(docs)
         print "Result theta: "
