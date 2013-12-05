@@ -38,8 +38,8 @@ class Action:
         'has_id',
         'has_class',
         'button_model',
-        'relative_x',
-        'relative_y',
+        #'relative_x',
+        #'relative_y',
         'alreadyInteracted',
     ]
 
@@ -56,7 +56,7 @@ class Action:
             elem.setAttribute("x-WebtalkInteracted", "1")
             ''', self.element)
 
-        if dry and self.type == 'click':
+        if dry:
             seutil.highlight(driver, self.element, opacity=0.5)
             return
 
@@ -99,6 +99,7 @@ class State:
         actions = []
         for el in self.features:
             if el['typeable'] == 1:
+                actions.append(Action(el['element'], 'click', el)) # DELETE ME
                 for subwords in self._subcommands():
                     actions.append(Action(el['element'], 'type', el, params=subwords))
             else:
@@ -108,8 +109,11 @@ class State:
     def phi_dot_theta(self, action, theta, verbose=False):
         phi = action.as_numeric_vector()
 
+
         if verbose:
             print 'Product:'
+            print np.dot(phi, theta)
+            print action.features['sibling_text_words']
             for i,f in enumerate(Action.FEATURE_NAMES):
                 print '\t%+.4f\t%s\t%.4f * %.4f' % (phi[i]*theta[i], f, phi[i], theta[i])
 
@@ -161,7 +165,7 @@ def likelihood_and_marginal(w, h):
         return _LandH_cache[(w,h)]
     #likelihood_button = (stats.norm.cdf(h+1, loc=my, scale=sy) - stats.norm.cdf(h, loc=my, scale=sy)) * (stats.norm.cdf(w+1, loc=mx, scale=sx) - stats.norm.cdf(w, loc=mx, scale=sx))
     _LandH_cache[(w,h)] = (
-        BUTTON_SIZE_KDE.integrate_box([w,h], [w+1,h+1]), 
+        BUTTON_SIZE_KDE.integrate_box([w,h], [w+1,h+1]),
         ELEMENT_SIZE_KDE.integrate_box([w,h], [w+1,h+1])
     )
     return _LandH_cache[(w,h)]
@@ -186,7 +190,7 @@ def extend_and_norm_feature(element, feature, command, num_elems):
     prior = 0.02
     likelihood_button, marginal = likelihood_and_marginal(w, h)
 
-    feature['button_model'] = (likelihood_button * prior) / marginal
+    feature['button_model'] = ((likelihood_button * prior) / marginal) - .147
 
     # relative x and y can  be more than 1 because things can be beyond the edge of the window
     # so nudge things to be between -1 and 1
@@ -203,6 +207,10 @@ def extend_and_norm_feature(element, feature, command, num_elems):
 def extract(driver, command):
     driver.execute_script(open(UNDERSCORE_JS).read())
     features, tree = driver.execute_script(open(GET_FEATURES_JS).read())
+    print tree
+    for f in features:
+        print f[1]['tagname']
+    print
     features = [extend_and_norm_feature(f[0], f[1], command, len(features)) for f in features]
 
     return features, tree
