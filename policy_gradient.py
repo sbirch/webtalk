@@ -30,7 +30,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000"):
 
                     action, best_score, probs = state.get_action_probs(actions, theta)
 
-                    state.phi_dot_theta(action, theta, verbose=True)
+                    #state.phi_dot_theta(action, theta, verbose=True)
 
                     print "Performing... %r for %r" % (action, annotated_cmd[0])
                     action.perform(driver)
