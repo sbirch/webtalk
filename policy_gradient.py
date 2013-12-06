@@ -94,7 +94,7 @@ def reward_gold_standard(history, document, perfect=1, ok=0.5, bad=-1):
 
         right_type = action.type == gold_type
         right_element = action.element.get_attribute('x-wtid') == gold_wtid
-        right_text = gold_text != None and action.params == gold_text
+        right_text = gold_text != None or action.params == gold_text
 
         if right_type and right_element and right_text:
             reward += perfect
