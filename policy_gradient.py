@@ -56,7 +56,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
                 gradient = np.zeros(len(web.Action.FEATURE_NAMES))
                 for t in range(len(document)):
-                    phi_t = actions[t].as_numeric_vector()
+                    phi_t = state_actions[t][1].as_numeric_vector()
 
                     # STEP 4
                     weighted_actions = np.zeros(len(web.Action.FEATURE_NAMES))

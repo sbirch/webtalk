@@ -4,6 +4,7 @@ import policy_gradient
 from data import gen_docs
 
 docs = gen_docs.get_all_docs()[:10]
+#docs = [[("Hit submit", ("click", "submit", None))]]
 
 theta_of_all_thetas = [0.17334518, 0.90195079, 0.42518274, 0.72998457,\
         0.56155784, 0.2100886, 0.73153149, 0.20276437, 0.0031535, 0.21628661]
