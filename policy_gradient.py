@@ -42,9 +42,9 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                             action = a
                             break
 
-                    state.phi_dot_theta(action, theta, verbose=True)
+                    #state.phi_dot_theta(action, theta, verbose=True)
 
-                    print "Performing... %r for %r" % (action, annotated_cmd[0])
+                    #print "Performing... %r for %r" % (action, annotated_cmd[0])
                     action.perform(driver, dry=True)
 
                     state_actions.append((
@@ -94,7 +94,7 @@ def reward_gold_standard(history, document, perfect=1, ok=0.5, bad=-1):
 
         right_type = action.type == gold_type
         right_element = action.element.get_attribute('x-wtid') == gold_wtid
-        right_text = gold_text != None or action.params == gold_text
+        right_text = gold_text == None or action.params == gold_text
 
         if right_type and right_element and right_text:
             reward += perfect

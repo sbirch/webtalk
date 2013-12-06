@@ -153,8 +153,8 @@ class State:
 
         return random.choice(max_action), max_v, products
 
-def start(url):
-    driver = seutil.get_driver()
+def start(url, headless=False):
+    driver = seutil.get_driver(headless)
     driver.get(url)
     return driver
 
