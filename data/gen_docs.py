@@ -2,9 +2,9 @@ from collections import defaultdict
 
 # dict from sequence number to a tuple with command and a second tuple with its
 # semantic representation
-def get_all_docs():
+def get_all_docs(cmds_file):
     commands = defaultdict(list)
-    for l in open("data/sendacard_corpus.tsv"):
+    for l in open(cmds_file):
         split_line = l.split("\t")
 
         n = int(split_line[0])
