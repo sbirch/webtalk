@@ -26,6 +26,8 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                 state_actions = []
                 action_choices = []
 
+                rewarder = Rewarder([command[1] for command in document])
+
                 # STEP 3
                 for t in range(len(document)):
                     annotated_cmd = document[t]
@@ -43,8 +45,9 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                             action = a
                             break
 
-                    #state.phi_dot_theta(action, theta, verbose=True)
+                    rewarder.update_reward(state, action)
 
+                    #state.phi_dot_theta(action, theta, verbose=True)
                     #print "Performing... %r for %r" % (action, annotated_cmd[0])
                     action.perform(driver, dry=True)
 
@@ -69,8 +72,8 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                     gradient = np.add(gradient, np.subtract(phi_t, weighted_actions))
 
                 # STEP 5
-                r = reward_gold_standard(state_actions, document)
-                print "Reward: %", r
+                r = rewarder.get_reward() #reward_gold_standard(state_actions, document)
+                print "Reward:", r
 
                 reward_history.append(r)
 
@@ -87,6 +90,40 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
         plt.show()
 
     return theta
+
+
+class Rewarder:
+    def __init__(self, correct, perfect=1, ok=0.5, bad=-1):
+        self.reward_history = []
+        self.correct = correct
+        self.perfect = perfect
+        self.ok = ok
+        self.bad = bad
+    def update_reward(self, state, action):
+        self.reward_history.append((
+            action.type,
+            action.element.get_attribute('x-wtid'),
+            action.params
+        ))
+    def get_reward(self):
+        reward = 0
+
+        for i, (a_type, a_element, a_text) in enumerate(self.reward_history):
+            gold_type, gold_wtid, gold_text = self.correct[i]
+
+            right_type = a_type == gold_type
+            right_element = a_element == gold_wtid
+            right_text = gold_text == None or a_text == gold_text
+
+            if right_type and right_element and right_text:
+                reward += self.perfect
+            elif right_type and right_element and not right_text:
+                reward += self.ok
+            else:
+                reward += self.bad
+
+        return reward*1.0 / len(self.reward_history)
+
 
 def reward_gold_standard(history, document, perfect=1, ok=0.5, bad=-1):
     correct = [command[1] for command in document]
