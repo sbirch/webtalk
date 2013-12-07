@@ -4,13 +4,13 @@ import random
 import time
 import util.str_util as str_util
 import copy
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 from data import gen_docs
 
 ITERATIONS = 4
 
 # takes in a list of lists of commands which should be executed in order
-def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=True):
+def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=False):
     theta = np.zeros(len(web.Action.FEATURE_NAMES))
     for i in range(len(web.Action.FEATURE_NAMES)):
         theta[i] = random.random()
@@ -43,9 +43,9 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                             action = a
                             break
 
-                    state.phi_dot_theta(action, theta, verbose=True)
+                    #state.phi_dot_theta(action, theta, verbose=True)
 
-                    print "Performing... %r for %r" % (action, annotated_cmd[0])
+                    #print "Performing... %r for %r" % (action, annotated_cmd[0])
                     action.perform(driver, dry=True)
 
                     state_actions.append((
@@ -57,7 +57,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
                 gradient = np.zeros(len(web.Action.FEATURE_NAMES))
                 for t in range(len(document)):
-                    phi_t = actions[t].as_numeric_vector()
+                    phi_t = state_actions[t][1].as_numeric_vector()
 
                     # STEP 4
                     weighted_actions = np.zeros(len(web.Action.FEATURE_NAMES))
@@ -98,7 +98,7 @@ def reward_gold_standard(history, document, perfect=1, ok=0.5, bad=-1):
 
         right_type = action.type == gold_type
         right_element = action.element.get_attribute('x-wtid') == gold_wtid
-        right_text = gold_text != None and action.params == gold_text
+        right_text = gold_text == None or action.params == gold_text
 
         if right_type and right_element and right_text:
             reward += perfect

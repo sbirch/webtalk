@@ -3,9 +3,11 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 import uuid
 
-def get_driver():
-    driver = webdriver.Chrome(executable_path="./chromedriver")
-   # driver = webdriver.phantomjs.webdriver.WebDriver()
+def get_driver(headless=False):
+    if headless:
+        driver = webdriver.phantomjs.webdriver.WebDriver()
+    else:
+        driver = webdriver.Chrome(executable_path="./chromedriver")
     driver.set_window_size(1400, 900)
     driver.set_window_position(200, 50)
 
