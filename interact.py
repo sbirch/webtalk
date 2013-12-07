@@ -1,14 +1,18 @@
 import numpy as np
 import web
 import policy_gradient
+import random
 from data import gen_docs
 
-docs = gen_docs.get_all_docs()[:10]
+docs = gen_docs.get_all_docs()[10:]
+print docs[0]
 #docs = [[("Hit submit", ("click", "submit", None))]]
 
-theta_of_all_thetas = [0.17334518, 0.90195079, 0.42518274, 0.72998457,\
-        0.56155784, 0.2100886, 0.73153149, 0.20276437, 0.0031535, 0.21628661]
-theta = policy_gradient.policy_gradient(docs)
+theta_of_all_thetas = [5.19141646, 0.94069248, 7.67249229, -1.43515366, \
+                       3.75413168, 2.51073774, 0.38076579,  0.63318844,\
+                       4.80660684, 3.97727048, -2.29169644,  -3.44135489]
+#theta = policy_gradient.policy_gradient(docs)
+theta = theta_of_all_thetas
 
 start_url = "http://localhost:8000"
 

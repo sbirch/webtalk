@@ -6,8 +6,9 @@ import util.str_util as str_util
 import copy
 #from matplotlib import pyplot as plt
 from data import gen_docs
+from scipy.spatial import distance
 
-ITERATIONS = 4
+ITERATIONS = 5
 
 # takes in a list of lists of commands which should be executed in order
 def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=False):
@@ -21,6 +22,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
     driver = web.start(start_url)
     try:
         for i in range(ITERATIONS):
+            avg_dist = 0
             for doc_num, document in enumerate(command_documents):
                 driver.get(start_url)
                 state_actions = []
@@ -37,6 +39,11 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
                     action, best_score, probs = state.get_action_probs(actions, theta)
 
+                    # we got to page where we cant do anything any more so end
+                    # the history here
+                    if action == None:
+                        break
+
                     r = random.random()
                     acc_prob = 0
                     for a in probs:
@@ -49,7 +56,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
                     #state.phi_dot_theta(action, theta, verbose=True)
                     #print "Performing... %r for %r" % (action, annotated_cmd[0])
-                    action.perform(driver, dry=True)
+                    action.perform(driver, dry=False)
 
                     state_actions.append((
                         state,
@@ -59,7 +66,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                     action_choices.append(probs)
 
                 gradient = np.zeros(len(web.Action.FEATURE_NAMES))
-                for t in range(len(document)):
+                for t in range(len(state_actions)):
                     phi_t = state_actions[t][1].as_numeric_vector()
 
                     # STEP 4
@@ -79,6 +86,13 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
                 theta = np.add(theta, np.multiply(r, gradient))
                 theta_history.append(copy.copy(theta))
+                print theta
+                if len(theta_history) > 1:
+                    avg_dist += distance.euclidean(theta, theta_history[-2]) / len(command_documents)
+            print "Avg_dist:" , avg_dist
+            if avg_dist < .1:
+                print "Theta is not changing much in the latest iteration, breaking"
+                break
     finally:
         driver.quit()
 

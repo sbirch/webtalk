@@ -134,6 +134,9 @@ class State:
         '''Chooses the modal action'''
         products = {}
 
+        if len(actions) == 0:
+            return None, 0, products
+
         normalization = 0.0
         for action in actions:
             v = math.exp(self.phi_dot_theta(action, theta))

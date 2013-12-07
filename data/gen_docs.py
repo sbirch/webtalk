@@ -25,7 +25,7 @@ def get_all_docs():
 
 
     def rec_gendocs(step_num = 1, doc_so_far = []):
-        if step_num == 5:
+        if step_num == len(commands):
             all_docs.append(doc_so_far)
 
         for command in commands[step_num]:
