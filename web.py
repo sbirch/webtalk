@@ -45,8 +45,10 @@ class Action:
         'single_subword',
         'double_subword',
         #'big_subword',
-        'contains_action_word',
-        #'contains_stop_word'
+        #'contains_action_word',
+        #'contains_stop_word',
+        #'contains_element_word',
+        'contains_element_sib_word',
     ]
 
     def __init__(self, element, atype, features, params=None):
@@ -191,10 +193,15 @@ def extend_subword_features(feature, subwords, command):
     feature['big_subword'] = 1 if len(subwords) > 2 else 0
 
     action_words = 'press hit click type enter put'.split(' ')
-    feature['contains_action_word'] = 1 if any([w.lower() in action_words for w in subwords]) else 0
+    feature['contains_action_word'] = 1 if any([w.lower() in action_words for w in subwords]) else -1
 
     stop_words = 'the in as for to'.split(' ')
-    feature['contains_stop_word'] = 1 if any([w.lower() in stop_words for w in subwords]) else 0
+    feature['contains_stop_word'] = 1 if any([w.lower() in stop_words for w in subwords]) else -1
+
+    bad_words = feature['sibling_text_words'] + stop_words + action_words
+    #feature['contains_element_word'] = 1 - (sum([w.lower() in feature['text_words']+action_words+stop_words for w in subwords]) / float(max(len(feature['text_words']),len(subwords))))
+    feature['contains_element_sib_word'] = (sum([w.lower() in bad_words for w in subwords]) / float(max(len(bad_words),len(subwords))))
+    #feature['contains_element_sib_word'] = 1 if any([w.lower() in feature['sibling_text_words'] for w in subwords]) else -1
 
     return feature
 

@@ -8,13 +8,13 @@ import copy
 from data import gen_docs
 from scipy.spatial import distance
 
-ITERATIONS = 5
+ITERATIONS = 50
 
 # takes in a list of lists of commands which should be executed in order
 def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=False):
     theta = np.zeros(len(web.Action.FEATURE_NAMES))
     for i in range(len(web.Action.FEATURE_NAMES)):
-        theta[i] = random.random()
+        theta[i] = random.random() / 100
 
     theta_history = [copy.copy(theta)]
     reward_history = []
@@ -55,7 +55,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                     rewarder.update_reward(state, action)
 
                     #state.phi_dot_theta(action, theta, verbose=True)
-                    #print "Performing... %r for %r" % (action, annotated_cmd[0])
+                    print "Performing... %r for %r" % (action, annotated_cmd[0])
                     action.perform(driver, dry=False)
 
                     state_actions.append((
@@ -107,7 +107,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
 
 class Rewarder:
-    def __init__(self, correct, perfect=1, ok=0.5, bad=-1):
+    def __init__(self, correct, perfect=1, ok=0.8, bad=-1):
         self.reward_history = []
         self.correct = correct
         self.perfect = perfect
@@ -124,42 +124,32 @@ class Rewarder:
 
         for i, (a_type, a_element, a_text) in enumerate(self.reward_history):
             gold_type, gold_wtid, gold_text = self.correct[i]
+            if gold_text: gold_text = web.tokenize_command(gold_text)
 
             right_type = a_type == gold_type
             right_element = a_element == gold_wtid
-            right_text = gold_text == None or a_text == gold_text
 
-            if right_type and right_element and right_text:
-                reward += self.perfect
-            elif right_type and right_element and not right_text:
+            print "Gold text " ,gold_text
+            print "a_text ", a_text
+
+            if right_type and right_element:
                 reward += self.ok
+
+                if gold_text and a_text:
+                    text_rightness = float(len(set(gold_text).intersection(set(a_text)))) / max(len(gold_text), len(a_text))
+                    print text_rightness
+
+
+                    reward += (self.perfect - self.ok)  * text_rightness
+                elif not gold_text and not a_text:
+                    reward += self.perfect - self.ok
+            elif right_type:
+                reward += .25
             else:
                 reward += self.bad
 
         return reward*1.0 / len(self.reward_history)
 
-
-def reward_gold_standard(history, document, perfect=1, ok=0.5, bad=-1):
-    correct = [command[1] for command in document]
-
-    reward = 0
-
-    for i, (state, action, best_score) in enumerate(history):
-        gold_type, gold_wtid, gold_text = correct[i]
-
-        right_type = action.type == gold_type
-        right_element = action.element.get_attribute('x-wtid') == gold_wtid
-        right_text = gold_text == None or action.params == gold_text
-
-        if right_type and right_element and right_text:
-            reward += perfect
-        elif right_type and right_element and not right_text:
-            reward += ok
-        else:
-            reward += bad
-
-
-    return reward / len(history)
 
 
 def reward_branavan(history):

@@ -40,7 +40,7 @@ function filter_word_list(a_word_list) {
     var result = []
     a_word_list.forEach(function(word) { 
         if (word.length > SHORT_WORD_LEN) {
-            result.push(word);
+            result.push(word.toLowerCase());
         }
     });
 
@@ -107,7 +107,7 @@ var Features = {
 	var words = []
 	if (elem.value && this.isClickable(elem)) words.push(elem.value);
 	if (elem.alt) words.push(elem.alt);
-    return filter_word_list(elem.textContent.split(/\s+/).concat(words));
+    return filter_word_list(elem.textContent.replace(/\W/g, '').split(/\s+/).concat(words));
   },
 
   // produces a list of filtered words in text 
