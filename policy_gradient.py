@@ -139,7 +139,7 @@ class Rewarder:
 
                 if gold_text and a_text:
                     text_rightness = float(len(set(gold_text).intersection(set(a_text)))) / max(len(gold_text), len(a_text))
-                    print text_rightness
+                    #print text_rightness
 
 
                     reward += (self.perfect - self.ok)  * text_rightness

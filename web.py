@@ -258,7 +258,7 @@ def extend_subword_features(feature, subwords, command):
     # Note that this is not the phrase likelihood, but the average term likelihood
     feature['word_entropy'] = sum([UNIGRAM_MODEL(w) for w in subwords]) / len(subwords)
 
-    tf_idf = feature['word_entropy'] * (sum([IDF_MODEL(w) for w in subwords]) / len(subwords))
+    tf_idf = sum([IDF_MODEL(w) for w in subwords]) / len(subwords)
     feature['tf_idf'] = tf_idf
 
     return feature
