@@ -39,6 +39,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
                     action, best_score, probs = state.get_action_probs(actions, theta)
 
+
                     # we got to page where we cant do anything any more so end
                     # the history here
                     if action == None:
@@ -52,6 +53,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                             action = a
                             break
 
+                    state.phi_dot_theta(action, theta, verbose=True)
                     rewarder.update_reward(state, action)
 
                     #state.phi_dot_theta(action, theta, verbose=True)

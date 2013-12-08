@@ -107,7 +107,7 @@ var Features = {
 	var words = []
 	if (elem.value && this.isClickable(elem)) words.push(elem.value);
 	if (elem.alt) words.push(elem.alt);
-    return filter_word_list(elem.textContent.replace(/\W/g, '').split(/\s+/).concat(words));
+    return filter_word_list(elem.textContent.replace(/[^a-z A-Z]+/g, '').split(/\s+/).concat(words));
   },
 
   // produces a list of filtered words in text 
