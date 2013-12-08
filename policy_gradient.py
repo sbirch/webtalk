@@ -4,7 +4,7 @@ import random
 import time
 import util.str_util as str_util
 import copy
-#from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 from data import gen_docs
 from scipy.spatial import distance
 
@@ -32,8 +32,9 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
                 # STEP 3
                 for t in range(len(document)):
-                    annotated_cmd = document[t]
-                    state = web.build_state(driver, web.tokenize_command(annotated_cmd[0]))
+                    cmd, annotation = document[t]
+
+                    state = web.build_state(driver, web.tokenize_command(cmd))
 
                     actions = state.enumerate_actions()
 
@@ -45,6 +46,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                     if action == None:
                         break
 
+                    # pick an action weighted by how likely it is
                     r = random.random()
                     acc_prob = 0
                     for a in probs:
@@ -54,10 +56,10 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                             break
 
                     state.phi_dot_theta(action, theta, verbose=True)
+
                     rewarder.update_reward(state, action)
 
-                    #state.phi_dot_theta(action, theta, verbose=True)
-                    print "Performing... %r for %r" % (action, annotated_cmd[0])
+                    print "Performing... %r for %r" % (action, cmd)
                     action.perform(driver, dry=False)
 
                     state_actions.append((

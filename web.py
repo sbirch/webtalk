@@ -65,7 +65,6 @@ class Action:
         self.features = features
 
     def perform(self, driver, dry=False):
-
         driver.execute_script('''
             var elem = arguments[0]
             elem.setAttribute("x-WebtalkInteracted", "1")
