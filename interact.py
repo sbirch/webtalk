@@ -5,14 +5,16 @@ import random
 from data import gen_docs
 
 docs = gen_docs.get_all_docs("data/sendacard_corpus.tsv")
-docs = random.shuffle(docs)[:25]
+random.shuffle(docs)
+docs = docs[:25]
 
 #docs = gen_docs.get_all_docs("data/sendacard_corpus.tsv")[:25]
 #docs = [[("Hit submit", ("click", "submit", None))]]
 
-theta_of_all_thetas = [5.19141646, 0.94069248, 7.67249229, -1.43515366, \
-                       3.75413168, 2.51073774, 0.38076579,  0.63318844,\
-                       4.80660684, 3.97727048, -2.29169644,  -3.44135489]
+#theta_of_all_thetas = [5.19141646, 0.94069248, 7.67249229, -1.43515366, \
+#                       3.75413168, 2.51073774, 0.38076579,  0.63318844,\
+#                       4.80660684, 3.97727048, -2.29169644,  -3.44135489]
+
 theta = policy_gradient.policy_gradient(docs)
 #theta = theta_of_all_thetas
 

@@ -1,18 +1,19 @@
 from selenium import webdriver, selenium
 from util.perf import tick, tock
 import util.str_util as str_util
+from collections import Counter
 import util.seutil as seutil
+import scipy.stats as stats
+from data import gen_docs
+import numpy as np
 import sys
 import time
 import itertools
 import random
 import math
-import scipy.stats as stats
-import numpy as np
 import json
 import copy
-from data import gen_docs
-from collections import Counter
+import csv
 import string
 import re
 
@@ -53,7 +54,8 @@ class Action:
         #contains_stop_word',
         #'contains_element_word',
         'contains_element_sib_word',
-        ''
+        'word_entropy',
+        'tf_idf'
     ]
 
     def __init__(self, element, atype, features, params=None):
@@ -192,7 +194,7 @@ def likelihood_and_marginal(w, h):
 
 def build_unigram_model(corpus):
     words = reduce(lambda x,y: x+y, (re.split('\s+', sentence) for sentence in corpus))
-    words = (word.lower().strip(string.punctuation) for word in words)
+    words = [word.lower().strip(string.punctuation) for word in words]
     norm = float(len(words))
     model = Counter()
 
@@ -205,13 +207,42 @@ def build_unigram_model(corpus):
 
     return evalmodel
 
+def build_idf_model(corpus):
+    sentences = [[w.lower().strip(string.punctuation) for w in re.split('\s+', sentence)] for sentence in corpus]
+    words = set(reduce(lambda x,y: x+y, sentences))
 
-CORPUS = gen_docs.get_all_docs('data/sendacard_corpus.tsv')
-UNIGRAM_MODEL = build_unigram_model([x[0] for x in reduce(lambda x,y: x+y, CORPUS)])
+    model = {}
+
+    for word in words:
+        model[word] = math.log(len(sentences) / (sum([1.0 for sentence in sentences if word in sentence]) + 1.0))
+
+    def evalmodel(w):
+        # Laplace smoothed!
+        return model.get(w.lower().strip(string.punctuation), len(sentences)) / (1.0*len(sentences))
+
+    return evalmodel
+
+# A list of documents (lists of words)
+CORPUS = [x[1] for x in csv.reader(open('data/sendacard_corpus.tsv', 'rb'), delimiter='\t')]
+CORPUS += [x[1] for x in csv.reader(open('data/sendacard_mturk_corpus.tsv', 'rb'), delimiter='\t')]
+CORPUS += [x[1] for x in csv.reader(open('data/hipmunk_corpus.tsv', 'rb'), delimiter='\t')]
+
+UNIGRAM_MODEL = build_unigram_model(CORPUS)
+IDF_MODEL = build_idf_model(CORPUS)
 
 def extend_subword_features(feature, subwords, command):
     if subwords is None:
-        subwords = []
+        feature['single_subword'] = 0
+        feature['double_subword'] = 0
+        feature['big_subword'] = 0
+        feature['contains_action_word'] = 0
+        feature['contains_stop_word'] = 0
+        feature['contains_element_word'] = 0
+        feature['contains_element_sib_word'] = 0
+        feature['word_entropy'] = 0
+        feature['tf_idf'] = 0
+        return feature
+
     feature['single_subword'] = 1 if len(subwords) == 1 else 0
     feature['double_subword'] = 1 if len(subwords) == 2 else 0
     feature['big_subword'] = 1 if len(subwords) > 2 else 0
@@ -229,6 +260,9 @@ def extend_subword_features(feature, subwords, command):
 
     # Note that this is not the phrase likelihood, but the average term likelihood
     feature['word_entropy'] = sum([UNIGRAM_MODEL(w) for w in subwords]) / len(subwords)
+
+    tf_idf = feature['word_entropy'] * (sum([IDF_MODEL(w) for w in subwords]) / len(subwords))
+    feature['tf_idf'] = tf_idf
 
     return feature
 
