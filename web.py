@@ -5,6 +5,7 @@ from collections import Counter
 import util.seutil as seutil
 import scipy.stats as stats
 from data import gen_docs
+import text_classification
 import numpy as np
 import sys
 import time
@@ -53,9 +54,10 @@ class Action:
         #'contains_action_word',
         #contains_stop_word',
         #'contains_element_word',
-        'contains_element_sib_word',
-        'word_entropy',
-        'tf_idf'
+        #'contains_element_sib_word',
+        #'word_entropy',
+        #'tf_idf',
+        'text_blackbox'
     ]
 
     def __init__(self, element, atype, features, params=None):
@@ -226,8 +228,11 @@ CORPUS += [x[1] for x in csv.reader(open('data/hipmunk_corpus.tsv', 'rb'), delim
 UNIGRAM_MODEL = build_unigram_model(CORPUS)
 IDF_MODEL = build_idf_model(CORPUS)
 
+BLACKBOX = text_classification.build_default_model()
+
 def extend_subword_features(feature, subwords, command):
     if subwords is None:
+        '''
         feature['single_subword'] = 0
         feature['double_subword'] = 0
         feature['big_subword'] = 0
@@ -237,8 +242,13 @@ def extend_subword_features(feature, subwords, command):
         feature['contains_element_sib_word'] = 0
         feature['word_entropy'] = 0
         feature['tf_idf'] = 0
+        '''
+        feature['text_blackbox'] = 0
         return feature
 
+    feature['text_blackbox'] = BLACKBOX(subwords)
+
+    '''
     feature['single_subword'] = 1 if len(subwords) == 1 else 0
     feature['double_subword'] = 1 if len(subwords) == 2 else 0
     feature['big_subword'] = 1 if len(subwords) > 2 else 0
@@ -259,6 +269,7 @@ def extend_subword_features(feature, subwords, command):
 
     tf_idf = sum([IDF_MODEL(w) for w in subwords]) / len(subwords)
     feature['tf_idf'] = tf_idf
+    '''
 
     return feature
 

@@ -31,8 +31,8 @@ def evaluate(eval_corpus_file, theta, start_url):
 
             if action and \
                action.type == cmd_type and \
-               action.element.get_attribute('x-wtid') == wtid:
-               #action.params == arg:
+               action.element.get_attribute('x-wtid') == wtid and \
+               action.params == arg:
                    correct_cmds += 1
             else:
                 doc_correct = False
@@ -49,6 +49,9 @@ if __name__ == "__main__":
     theta_of_all_thetas = [5.19141646, 0.94069248, 7.67249229, -1.43515366, \
                            3.75413168, 2.51073774, 0.38076579,  0.63318844,\
                            4.80660684, 3.97727048, -2.29169644,  -3.44135489]
+
+    theta_of_all_thetas = [ -7.42530771e-01,   3.64532909e-01,   3.09148762e+00,  -6.09855613e-01, 2.40186805e+00,  -5.43848967e-02,   2.55388757e-03,   1.01044563e-01, 1.95811246e+00,   2.61664583e+00]
+
     doc_pct, cmd_pct = evaluate("data/sendacard_mturk_corpus.tsv", theta_of_all_thetas, "http://localhost:8000")
 
     print "Doc Pct: " , doc_pct , " Cmd Pct: " , cmd_pct
