@@ -131,8 +131,8 @@ class Rewarder:
             right_type = a_type == gold_type
             right_element = a_element == gold_wtid
 
-            print "Gold text " ,gold_text
-            print "a_text ", a_text
+            #print "Gold text " ,gold_text
+            #print "a_text ", a_text
 
             if right_type and right_element:
                 reward += self.ok

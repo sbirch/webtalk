@@ -129,12 +129,9 @@ class State:
 
 
         if verbose:
-            print 'Product:'
-            print np.dot(phi, theta)
-            print action.features['text_words']
-            print action.features['sibling_text_words']
+            print u'Product (%.4f, \u03d5 * \u03b8):' % np.dot(phi, theta)
             for i,f in enumerate(Action.FEATURE_NAMES):
-                print '\t%+.4f\t%s\t%.4f * %.4f' % (phi[i]*theta[i], f, phi[i], theta[i])
+                print '\t%+.4f\t%s%+.4f * %+.4f' % (phi[i]*theta[i], f.ljust(30), phi[i], theta[i])
 
 
         return np.dot(phi, theta)
