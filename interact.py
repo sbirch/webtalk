@@ -5,8 +5,9 @@ import random
 from data import gen_docs
 
 docs = gen_docs.get_all_docs("data/sendacard_corpus.tsv")
-docs = random.shuffle(docs)
-docs = gen_docs.get_all_docs("data/sendacard_corpus.tsv")[:25]
+docs = random.shuffle(docs)[:25]
+
+#docs = gen_docs.get_all_docs("data/sendacard_corpus.tsv")[:25]
 #docs = [[("Hit submit", ("click", "submit", None))]]
 
 theta_of_all_thetas = [5.19141646, 0.94069248, 7.67249229, -1.43515366, \

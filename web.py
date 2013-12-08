@@ -11,6 +11,10 @@ import scipy.stats as stats
 import numpy as np
 import json
 import copy
+from data import gen_docs
+from collections import Counter
+import string
+import re
 
 GET_FEATURES_JS = "js/get-features.js"
 UNDERSCORE_JS = "js/underscore.js"
@@ -49,6 +53,7 @@ class Action:
         #contains_stop_word',
         #'contains_element_word',
         'contains_element_sib_word',
+        ''
     ]
 
     def __init__(self, element, atype, features, params=None):
@@ -185,6 +190,25 @@ def likelihood_and_marginal(w, h):
     )
     return _LandH_cache[(w,h)]
 
+def build_unigram_model(corpus):
+    words = reduce(lambda x,y: x+y, (re.split('\s+', sentence) for sentence in corpus))
+    words = (word.lower().strip(string.punctuation) for word in words)
+    norm = float(len(words))
+    model = Counter()
+
+    for w in words:
+        model[w] += 1
+
+    def evalmodel(w):
+        # Laplace smoothed!
+        return (model[w.lower().strip(string.punctuation)]+1.0) / norm
+
+    return evalmodel
+
+
+CORPUS = gen_docs.get_all_docs('data/sendacard_corpus.tsv')
+UNIGRAM_MODEL = build_unigram_model([x[0] for x in reduce(lambda x,y: x+y, CORPUS)])
+
 def extend_subword_features(feature, subwords, command):
     if subwords is None:
         subwords = []
@@ -202,6 +226,9 @@ def extend_subword_features(feature, subwords, command):
     #feature['contains_element_word'] = 1 - (sum([w.lower() in feature['text_words']+action_words+stop_words for w in subwords]) / float(max(len(feature['text_words']),len(subwords))))
     feature['contains_element_sib_word'] = (sum([w.lower() in bad_words for w in subwords]) / float(max(len(bad_words),len(subwords))))
     #feature['contains_element_sib_word'] = 1 if any([w.lower() in feature['sibling_text_words'] for w in subwords]) else -1
+
+    # Note that this is not the phrase likelihood, but the average term likelihood
+    feature['word_entropy'] = sum([UNIGRAM_MODEL(w) for w in subwords]) / len(subwords)
 
     return feature
 
