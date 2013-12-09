@@ -1,17 +1,17 @@
 2	Type Smith in the Last Name box.	type	lastname	Smith
-2	Type Smith into the Last name box	type	lastname	Smith
-2	Type Smith in the Last Name box.	type	lastname	Smith
-2	Type Smith in the last name box.	type	lastname	Smith
+2	Type Johnson into the Last name box	type	lastname	Johnson
+2	Type Martinez in the Last Name box.	type	lastname	Martinez
+2	Type Nagy in the last name box.	type	lastname	Nagy
 1	Type John in the First Name box	type	firstname	John
-1	Type John in the First Name field.	type	firstname	John
-1	Type John in the First Name field	type	firstname	John
-1	Type John in the first name box.	type	firstname	John
-1	Type john in the First Name box.	type	firstname	John
+1	Type Bill in the First Name field.	type	firstname	Bill
+1	Type Jane in the First Name field	type	firstname	Jane
+1	Type Sammy in the first name box.	type	firstname	Sammy
+1	Type Marge in the First Name box.	type	firstname	Marge
 3	Type 6237 into the Mailbox space.	type	mailbox	6237
-3	Enter your mailbox number in the Mailbox field	type	mailbox	6237
-3	Type 6237 in Mailbox field	type	mailbox	6237
-3	Type 6237 in the Mailbox name box	type	mailbox	6237
-3	In the mailbox box type 6237.	type	mailbox	6237
+3	Type 3241 in Mailbox field	type	mailbox	3241
+3	Type 2341 in the Mailbox name box	type	mailbox	2341
+3	In the mailbox box type 2123.	type	mailbox	2123
+3	Enter 6237 in the Mailbox field	type	mailbox	6237
 4	Click the Continue button	click	continue	None
 4	Click Continue	click	continue	None
 4	Click the Continue button	click	continue	None
@@ -22,16 +22,15 @@
 5	Click on the chocolates tab.	click	chocolates	None
 5	Click the circle next to the word chocolates	click	chocolates	None
 5	Select Chocolates.	click	chocolates	None
-5	Click on the tab that says card.	click	flowers	None
-5	Select the Card option	click	flowers	None
-5	"Click the button next to ""Card"""	click	flowers	None
-5	Click the Card button.	click	flowers	None
-5	Press the button next to the word Card	click	flowers	None
-5	Click on the flowers tab.	click	card	None
-3	Enter 6237 in the Mailbox field	click	card	None
-5	Click the Flowers button.	click	card	None
-5	"Click the button next to ""Flowers"""	click	card	None
-5	Click the button next to the word Flowers	click	card	None
+5	Click on the tab that says card.	click	card	None
+5	Select the Card option	click	card	None
+5	"Click the button next to ""Card"""	click	card	None
+5	Click the Card button.	click	card	None
+5	Press the button next to the word Card	click	card	None
+5	Click on the flowers tab.	click	flowers	None
+5	Click the Flowers button.	click	flowers	None
+5	"Click the button next to ""Flowers"""	click	flowers	None
+5	Click the button next to the word Flowers	click	flowers	None
 6	Click submit	click	submit	None
 6	Click Submit.	click	submit	None
 6	Click the Submit button	click	submit	None

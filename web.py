@@ -48,7 +48,7 @@ class Action:
         #'contains_action_word',
         #contains_stop_word',
         #'contains_element_word',
-        #'contains_element_sib_word',
+        'contains_element_sib_word',
         #'word_entropy',
         #'tf_idf',
         'text_blackbox'
@@ -186,13 +186,14 @@ BLACKBOX = text_classification.build_default_model()
 def extend_subword_features(feature, subwords, command):
     if subwords is None:
         feature['text_blackbox'] = 0
-        #feature['contains_element_word'] = 0
-        #feature['contains_element_sib_word'] = 0
+        feature['contains_element_sib_word'] = 0
         return feature
 
-    #bad_words = feature['sibling_text_words'] + stop_words + action_words
+    action_words = 'press hit click type enter put'.split(' ')
+    stop_words = 'the in as for to'.split(' ')
+    bad_words = feature['sibling_text_words'] + stop_words + action_words
     #feature['contains_element_word'] = 1 - (sum([w.lower() in feature['text_words']+action_words+stop_words for w in subwords]) / float(max(len(feature['text_words']),len(subwords))))
-    #feature['contains_element_sib_word'] = (sum([w.lower() in bad_words for w in subwords]) / float(max(len(bad_words),len(subwords))))
+    feature['contains_element_sib_word'] = 1 - (sum([w.lower() in bad_words for w in subwords]) / float(max(len(bad_words),len(subwords))))
     #feature['contains_element_sib_word'] = 1 if any([w.lower() in feature['sibling_text_words'] for w in subwords]) else -1
 
     feature['text_blackbox'] = BLACKBOX(subwords)

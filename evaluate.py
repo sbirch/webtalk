@@ -36,6 +36,7 @@ def evaluate(eval_corpus_file, theta, start_url):
                (action.params == None or text_classification.untokenize_subcommand(action.params).lower() == arg.lower()):
                    correct_cmds += 1
             else:
+                print "Failed: ", action, " for ", text_cmd
                 doc_correct = False
 
             action.perform(driver)
@@ -48,9 +49,9 @@ def evaluate(eval_corpus_file, theta, start_url):
 if __name__ == "__main__":
     # generated this one friday dec 6
 
-    theta = [8.38515110e+00,   9.63934260e-01,  1.05792457e+01,  -4.32258654e+00,
-             6.42159957e+00,   2.45657051e+00,  8.16512377e-03,   1.02236192e+00,
-             6.45579111e+00,   7.19044059e+00]
+    theta = [7.20747115e+00,  1.69038401e+00,  8.53217940e+00,  -1.59279985e+00, \
+             3.18936265e+00,  3.28663595e+00,  6.51425808e-03,   6.79447331e-01, \
+             6.11002876e+00,  1.91920040e+00,   8.50328926e+00]
     doc_pct, cmd_pct = evaluate("data/sendacard_mturk_corpus.tsv", theta, "http://localhost:8000")
 
     print "Doc Pct: " , doc_pct , " Cmd Pct: " , cmd_pct
