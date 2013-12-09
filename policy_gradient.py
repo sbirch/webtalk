@@ -4,7 +4,6 @@ import random
 import time
 import util.str_util as str_util
 import copy
-from matplotlib import pyplot as plt
 from data import gen_docs
 from scipy.spatial import distance
 
@@ -101,6 +100,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
         driver.quit()
 
     if visualize:
+        from matplotlib import pyplot as plt
         plt.plot(reward_history, 'o')
         for i in range(len(web.Action.FEATURE_NAMES)):
             plt.plot([x[i] for x in theta_history])

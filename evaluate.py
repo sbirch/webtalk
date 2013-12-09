@@ -1,6 +1,7 @@
 from data import gen_docs
 import random
 import web
+import text_classification
 
 # return a tuple with the percentage of correct commands
 # and the percentage of correct documents for the given
@@ -32,7 +33,7 @@ def evaluate(eval_corpus_file, theta, start_url):
             if action and \
                action.type == cmd_type and \
                action.element.get_attribute('x-wtid') == wtid and \
-               action.params == arg:
+               (action.params == None or text_classification.untokenize_subcommand(action.params).lower() == arg.lower()):
                    correct_cmds += 1
             else:
                 doc_correct = False
@@ -46,13 +47,11 @@ def evaluate(eval_corpus_file, theta, start_url):
 
 if __name__ == "__main__":
     # generated this one friday dec 6
-    theta_of_all_thetas = [5.19141646, 0.94069248, 7.67249229, -1.43515366, \
-                           3.75413168, 2.51073774, 0.38076579,  0.63318844,\
-                           4.80660684, 3.97727048, -2.29169644,  -3.44135489]
 
-    theta_of_all_thetas = [ -7.42530771e-01,   3.64532909e-01,   3.09148762e+00,  -6.09855613e-01, 2.40186805e+00,  -5.43848967e-02,   2.55388757e-03,   1.01044563e-01, 1.95811246e+00,   2.61664583e+00]
-
-    doc_pct, cmd_pct = evaluate("data/sendacard_mturk_corpus.tsv", theta_of_all_thetas, "http://localhost:8000")
+    theta = [8.38515110e+00,   9.63934260e-01,  1.05792457e+01,  -4.32258654e+00,
+             6.42159957e+00,   2.45657051e+00,  8.16512377e-03,   1.02236192e+00,
+             6.45579111e+00,   7.19044059e+00]
+    doc_pct, cmd_pct = evaluate("data/sendacard_mturk_corpus.tsv", theta, "http://localhost:8000")
 
     print "Doc Pct: " , doc_pct , " Cmd Pct: " , cmd_pct
 

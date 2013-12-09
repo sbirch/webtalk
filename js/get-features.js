@@ -158,8 +158,8 @@ function elementToFeatureVector(elem) {
       // 0 = top of page, 1 = at fold
       relative_y: ((rect.top +  window.scrollY) / window.innerHeight),
 
-      clickable: Features.isClickable(elem)? 1:-1,
-      typeable: Features.isTypable(elem)? 1:-1,
+      clickable: Features.isClickable(elem)? 1:0,
+      typeable: Features.isTypable(elem)? 1:0,
 
       tagname: elem.tagName,
       text_words: Features.getTextWords(elem),
