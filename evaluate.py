@@ -9,7 +9,7 @@ import text_classification
 def evaluate(eval_corpus_file, theta, start_url):
     docs = gen_docs.get_all_docs(eval_corpus_file)
     random.shuffle(docs)
-    docs = docs[:200]
+    docs = docs[:100]
     driver = web.start(start_url)
 
     correct_docs = 0
@@ -49,9 +49,15 @@ def evaluate(eval_corpus_file, theta, start_url):
 if __name__ == "__main__":
     # generated this one friday dec 6
 
-    theta = [7.20747115e+00,  1.69038401e+00,  8.53217940e+00,  -1.59279985e+00, \
-             3.18936265e+00,  3.28663595e+00,  6.51425808e-03,   6.79447331e-01, \
-             6.11002876e+00,  1.91920040e+00,   8.50328926e+00]
+    #theta = [7.20747115e+00,  1.69038401e+00,  8.53217940e+00,  -1.59279985e+00, \
+    #         3.18936265e+00,  3.28663595e+00,  6.51425808e-03,   6.79447331e-01, \
+    #         6.11002876e+00,  1.91920040e+00,   8.50328926e+00]
+
+    theta = []
+    for i in range(len(web.Action.FEATURE_NAMES)):
+        theta.append(random.random() / 100)
+    print theta
+
     doc_pct, cmd_pct = evaluate("data/sendacard_mturk_corpus.tsv", theta, "http://localhost:8000")
 
     print "Doc Pct: " , doc_pct , " Cmd Pct: " , cmd_pct

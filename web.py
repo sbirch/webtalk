@@ -126,6 +126,7 @@ class State:
                 print '\t%+.4f\t%s%+.4f * %+.4f' % (phi[i]*theta[i], f.ljust(30), phi[i], theta[i])
 
 
+        print phi
         return np.dot(phi, theta)
 
     def get_action_probs(self, actions, theta):
