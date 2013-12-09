@@ -14,19 +14,13 @@ import random
 import math
 import json
 import copy
-import csv
 import string
 import re
 
 GET_FEATURES_JS = "js/get-features.js"
 UNDERSCORE_JS = "js/underscore.js"
 
-def tokenize_command(command):
-    command = unicode(command, 'utf-8')
-    return command.split(' ')
-
-def untokenize_subcommand(sub):
-    return ' '.join(sub)
+tokenize_command = text_classification.tokenize_command
 
 class Action:
     # These are the features used in the numeric representation of the feature
@@ -80,7 +74,7 @@ class Action:
             self.element.click()
         elif self.type == 'type':
             self.element.clear()
-            self.element.send_keys(untokenize_subcommand(self.params))
+            self.element.send_keys(text_classification.untokenize_subcommand(self.params))
 
     def as_numeric_vector(self):
         return tuple([
@@ -103,12 +97,9 @@ class State:
         if hasattr(self, '_subcommand_cache'):
             return self._subcommand_cache
 
-        subcommands = []
-        for window_size in range(1, len(self.command)+1):
-            for i in range(0, len(self.command)-window_size+1):
-                subcommands.append(self.command[i:i+window_size])
+        subs = [sub for sub, start, end in text_classification.subcommands(self.command)]
 
-        self._subcommand_cache = subcommands
+        self._subcommand_cache = subs
         return self._subcommand_cache
 
     def enumerate_actions(self):
@@ -190,86 +181,21 @@ def likelihood_and_marginal(w, h):
     )
     return _LandH_cache[(w,h)]
 
-def build_unigram_model(corpus):
-    words = reduce(lambda x,y: x+y, (re.split('\s+', sentence) for sentence in corpus))
-    words = [word.lower().strip(string.punctuation) for word in words]
-    norm = float(len(words))
-    model = Counter()
-
-    for w in words:
-        model[w] += 1
-
-    def evalmodel(w):
-        # Laplace smoothed!
-        return (model[w.lower().strip(string.punctuation)]+1.0) / norm
-
-    return evalmodel
-
-def build_idf_model(corpus):
-    sentences = [[w.lower().strip(string.punctuation) for w in re.split('\s+', sentence)] for sentence in corpus]
-    words = set(reduce(lambda x,y: x+y, sentences))
-
-    model = {}
-
-    for word in words:
-        model[word] = math.log(len(sentences) / (sum([1.0 for sentence in sentences if word in sentence]) + 1.0))
-
-    def evalmodel(w):
-        # Laplace smoothed!
-        return model.get(w.lower().strip(string.punctuation), len(sentences)) / (1.0*len(sentences))
-
-    return evalmodel
-
-# A list of documents (lists of words)
-CORPUS = [x[1] for x in csv.reader(open('data/sendacard_corpus.tsv', 'rb'), delimiter='\t')]
-CORPUS += [x[1] for x in csv.reader(open('data/sendacard_mturk_corpus.tsv', 'rb'), delimiter='\t')]
-CORPUS += [x[1] for x in csv.reader(open('data/hipmunk_corpus.tsv', 'rb'), delimiter='\t')]
-
-UNIGRAM_MODEL = build_unigram_model(CORPUS)
-IDF_MODEL = build_idf_model(CORPUS)
-
 BLACKBOX = text_classification.build_default_model()
 
 def extend_subword_features(feature, subwords, command):
     if subwords is None:
-        '''
-        feature['single_subword'] = 0
-        feature['double_subword'] = 0
-        feature['big_subword'] = 0
-        feature['contains_action_word'] = 0
-        feature['contains_stop_word'] = 0
-        feature['contains_element_word'] = 0
-        feature['contains_element_sib_word'] = 0
-        feature['word_entropy'] = 0
-        feature['tf_idf'] = 0
-        '''
         feature['text_blackbox'] = 0
+        #feature['contains_element_word'] = 0
+        #feature['contains_element_sib_word'] = 0
         return feature
 
-    feature['text_blackbox'] = BLACKBOX(subwords)
-
-    '''
-    feature['single_subword'] = 1 if len(subwords) == 1 else 0
-    feature['double_subword'] = 1 if len(subwords) == 2 else 0
-    feature['big_subword'] = 1 if len(subwords) > 2 else 0
-
-    action_words = 'press hit click type enter put'.split(' ')
-    feature['contains_action_word'] = 1 if any([w.lower() in action_words for w in subwords]) else -1
-
-    stop_words = 'the in as for to'.split(' ')
-    feature['contains_stop_word'] = 1 if any([w.lower() in stop_words for w in subwords]) else -1
-
-    bad_words = feature['sibling_text_words'] + stop_words + action_words
+    #bad_words = feature['sibling_text_words'] + stop_words + action_words
     #feature['contains_element_word'] = 1 - (sum([w.lower() in feature['text_words']+action_words+stop_words for w in subwords]) / float(max(len(feature['text_words']),len(subwords))))
-    feature['contains_element_sib_word'] = (sum([w.lower() in bad_words for w in subwords]) / float(max(len(bad_words),len(subwords))))
+    #feature['contains_element_sib_word'] = (sum([w.lower() in bad_words for w in subwords]) / float(max(len(bad_words),len(subwords))))
     #feature['contains_element_sib_word'] = 1 if any([w.lower() in feature['sibling_text_words'] for w in subwords]) else -1
 
-    # Note that this is not the phrase likelihood, but the average term likelihood
-    feature['word_entropy'] = sum([UNIGRAM_MODEL(w) for w in subwords]) / len(subwords)
-
-    tf_idf = sum([IDF_MODEL(w) for w in subwords]) / len(subwords)
-    feature['tf_idf'] = tf_idf
-    '''
+    feature['text_blackbox'] = BLACKBOX(subwords)
 
     return feature
 

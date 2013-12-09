@@ -1,12 +1,65 @@
-import web, pprint, csv, string, random, sys
+import pprint, csv, string, random, sys, math
+from nltk.tokenize import word_tokenize
 from collections import Counter
 from sklearn import svm
-from nltk.tokenize import word_tokenize
 
 #from nltk.tag import pos_tag  
 #import stanford_parser_pipe
 #print stanford_parser_pipe.parse('Type John in the First Name field')
 #sys.exit(0)
+
+def tokenize_command(command):
+    command = unicode(command, 'utf-8')
+    return [token.lower().strip(string.punctuation) for token in word_tokenize(command) if token not in string.punctuation]
+
+def untokenize_subcommand(sub):
+    return ' '.join(sub)
+
+def subcommands(command):
+    subs = []
+    for window_size in range(1, len(command)+1):
+        for i in range(0, len(command)-window_size+1):
+            subs.append((
+                command[i:i+window_size],
+                i, i+window_size
+            ))
+    return subs
+
+def build_unigram_model(corpus):
+    words = reduce(lambda x,y: x+y, (tokenize_command(sentence) for sentence in corpus))
+    norm = float(len(words))
+    model = Counter()
+
+    for w in words:
+        model[w] += 1
+
+    def evalmodel(w):
+        # Laplace smoothed!
+        return (model[w.lower().strip(string.punctuation)]+1.0) / norm
+
+    return evalmodel
+
+def build_idf_model(corpus):
+    sentences = [tokenize_command(sentence) for sentence in corpus]
+    words = set(reduce(lambda x,y: x+y, sentences))
+
+    model = {}
+
+    for word in words:
+        model[word] = math.log(len(sentences) / (sum([1.0 for sentence in sentences if word in sentence]) + 1.0))
+
+    def evalmodel(w):
+        # Laplace smoothed!
+        return model.get(w.lower().strip(string.punctuation), len(sentences)) / (1.0*len(sentences))
+
+    return evalmodel
+
+# A list of documents (lists of words)
+CORPUS = [x[1] for x in csv.reader(open('data/sendacard_corpus.tsv', 'rb'), delimiter='\t')]
+CORPUS += [x[1] for x in csv.reader(open('data/hipmunk_corpus.tsv', 'rb'), delimiter='\t')]
+
+UNIGRAM_MODEL = build_unigram_model(CORPUS)
+IDF_MODEL = build_idf_model(CORPUS)
 
 def feats(subwords, command, start, end):
     single_subword = 1 if len(subwords) == 1 else 0
@@ -20,9 +73,9 @@ def feats(subwords, command, start, end):
     contains_stop_word = 1 if any([w.lower() in stop_words for w in subwords]) else -1
 
     # Note that this is not the phrase likelihood, but the average term likelihood
-    word_entropy = sum([web.UNIGRAM_MODEL(w) for w in subwords]) / len(subwords)
+    word_entropy = sum([UNIGRAM_MODEL(w) for w in subwords]) / len(subwords)
 
-    tf_idf = sum([web.IDF_MODEL(w) for w in subwords]) / len(subwords)
+    tf_idf = sum([IDF_MODEL(w) for w in subwords]) / len(subwords)
 
     
     #tags = [(word, tag) for word, tag in pos_tag(command)][start:end]
@@ -39,17 +92,6 @@ def feats(subwords, command, start, end):
         #has_nn, has_dt, has_in
     ]
 
-def subcommands(command):
-    command = word_tokenize(command)
-    subcommands = []
-    for window_size in range(1, len(command)+1):
-        for i in range(0, len(command)-window_size+1):
-            subcommands.append((
-                command[i:i+window_size],
-                i, i+window_size
-            ))
-    return subcommands
-
 def read_data(path):
     data = list(csv.reader(open(path, 'rb'), delimiter='\t'))
     return [(sentence.strip(), text.strip()) for seq,sentence,action,element,text in data if action == 'type']
@@ -59,7 +101,7 @@ def build_model(train):
     labels = []
 
     for sentence, correct in train:
-        for subwords, start, end in subcommands(sentence):
+        for subwords, start, end in subcommands(tokenize_command(sentence)):
             f = feats(subwords, sentence, start, end)
 
             label = -1
@@ -84,8 +126,6 @@ def build_default_model():
     return evalmodel
 
 if __name__ == '__main__':
-    #clf = build_model(train)
-
     model = build_default_model()
 
     total_correct = 0
@@ -96,7 +136,7 @@ if __name__ == '__main__':
         print sentence, '=>', correct
 
         best = Counter()
-        for subwords, start, end in subcommands(sentence):
+        for subwords, start, end in subcommands(tokenize_command(sentence)):
             #f = feats(subwords, sentence, start, end)
             #prediction, decision_f = clf.predict(f)[0], clf.decision_function(f)[0]
             best[tuple(subwords)] += model(subwords)
