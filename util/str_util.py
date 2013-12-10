@@ -64,15 +64,21 @@ def new_dist(needle, haystack):
 
     needles = set(needle)
     needles_appear = defaultdict(list)
+    k = 0
     for i,w in enumerate(haystack):
         if w in needles:
             needles_appear[w].append(i)
+            k += 1
 
     #print needle
     #print haystack
     #print needles_appear
 
-    score = 0.0
+    # unigram terms
+    score = float(k)
+
+    # pair terms: for each pair of needle words and each pair of their appearances,
+    # add the inverse square of their appearance distance
     for n1, n2 in itertools.permutations(needle, 2):
         if n1 == n2:
             continue
@@ -84,6 +90,7 @@ def new_dist(needle, haystack):
     return score / len(haystack)
 
 if __name__ == '__main__':
+    '''
     q = 'In the Wake of Disaster'
 
     print 'TIGHT'
@@ -99,3 +106,6 @@ if __name__ == '__main__':
     print disorder
     print context
     print out
+    '''
+
+    print new_dist('type Boston in the from box'.split(), ['From', 'City', 'or', 'Airport'])

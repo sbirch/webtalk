@@ -224,7 +224,10 @@ def extend_and_norm_feature(element, feature, command, num_elems):
     prior = 0.02
     likelihood_button, marginal = likelihood_and_marginal(w, h)
 
-    feature['button_model'] = ((likelihood_button * prior) / marginal) - .147
+    if marginal != 0:
+        feature['button_model'] = ((likelihood_button * prior) / marginal) - .147
+    else:
+        feature['button_model'] = 0
 
     # relative x and y can  be more than 1 because things can be beyond the edge of the window
     # so nudge things to be between -1 and 1
