@@ -2,6 +2,7 @@ from data import gen_docs
 import random
 import web
 import text_classification
+import policy_gradient
 
 # return a tuple with the percentage of correct commands
 # and the percentage of correct documents for the given
@@ -39,7 +40,8 @@ def evaluate(eval_corpus_file, theta, start_url):
                 print "Failed: ", action, " for ", text_cmd
                 doc_correct = False
 
-            action.perform(driver)
+            if action:
+                action.perform(driver)
         if doc_correct:
             correct_docs += 1
 
@@ -49,14 +51,9 @@ def evaluate(eval_corpus_file, theta, start_url):
 if __name__ == "__main__":
     # generated this one friday dec 6
 
-    #theta = [7.20747115e+00,  1.69038401e+00,  8.53217940e+00,  -1.59279985e+00, \
-    #         3.18936265e+00,  3.28663595e+00,  6.51425808e-03,   6.79447331e-01, \
-    #         6.11002876e+00,  1.91920040e+00,   8.50328926e+00]
-
-    theta = []
-    for i in range(len(web.Action.FEATURE_NAMES)):
-        theta.append(random.random() / 100)
-    print theta
+    # Doc Pct:  0.37  Cmd Pct:  0.89
+    #theta = [7.4246, 1.6352, 7.2982, -2.9867, 5.4484, 2.0682, -0.0010, 0.8105, 5.0358, 6.9543]
+    theta = policy_gradient.policy_gradient([[]], ITERATIONS=0)
 
     doc_pct, cmd_pct = evaluate("data/sendacard_mturk_corpus.tsv", theta, "http://localhost:8000")
 

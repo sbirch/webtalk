@@ -1,9 +1,33 @@
 <html>
 	<head>
 		<title>Send something!</title>
+        <script src="jquery-1.10.2.js"></script>
+        <script>
+            function validate(e) {       
+                var fn = $("input")[0].value;
+                var ln = $("input")[1].value;
+                var mbn = $("input")[2].value;
+
+                console.log(fn);
+                console.log(ln);
+                console.log(mbn);
+
+
+                var mbn_match = mbn.match(/^\d+/);
+                if (fn == "" || ln == "" || mbn == "" || 
+                fn.match(/\W/) || ln.match(/\W/)|| mbn.match(/\W/) || mbn_match.length > 1 ||
+                mbn_match.length == 0 || mbn.match(/^\d+/)[0] != mbn) {
+
+                    window.location.assign("error.html");
+                    e.preventDefault();
+                    return false;
+                } 
+                return true;
+            }
+        </script>
 	</head>
 	<body>
-		<form method="GET" action="type.html">
+		<form onsubmit="validate(event)" method="GET" action="type.html">
 			<p id="input-fname">
 				First name:
 				<input type="text" name="first_name" x-wtid="firstname" />
