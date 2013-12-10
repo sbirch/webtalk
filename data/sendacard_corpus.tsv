@@ -11,15 +11,15 @@
 2	Type Kovacs for last name 	type	lastname	Kovacs
 2	Enter Birch in the last name field 	type	lastname	Birch
 2	Type Tellex in the last name thingy	type	lastname	Tellex
-3	Enter 5279 in box number	type	mailbox	5279
-3	Enter 1337 as box number	type	mailbox	1337
-3	Enter 1353 in the box number box	type	mailbox	1353
-3	Type 1336 for the box number	type	mailbox	1336
-3	Type 2352 in the box number field	type	mailbox	2352
-3	Enter 3582 for the box number	type	mailbox	3582
-3	Enter box 3253	type	mailbox	3253
-3	Type box 3252	type	mailbox	3252
-3	Enter the box number 3252	type	mailbox	3252
+3	Enter 5279 in mailbox number	type	mailbox	5279
+3	Enter 1337 as mailbox number	type	mailbox	1337
+3	Enter 1353 in the mailbox number box	type	mailbox	1353
+3	Type 1336 for the mailbox number	type	mailbox	1336
+3	Type 2352 in the mailbox number field	type	mailbox	2352
+3	Enter 3582 for the mailbox number	type	mailbox	3582
+3	Enter mailbox 3253	type	mailbox	3253
+3	Type mailbox 3252	type	mailbox	3252
+3	Enter the mailbox number 3252	type	mailbox	3252
 4	Click continue	click	continue	None
 4	Press continue	click	continue	None
 4	Hit continue	click	continue	None
