@@ -48,7 +48,7 @@ class Action:
         #'contains_action_word',
         #contains_stop_word',
         #'contains_element_word',
-        'contains_element_sib_word',
+        #'contains_element_sib_word',
         #'word_entropy',
         #'tf_idf',
         'text_blackbox'
@@ -125,8 +125,6 @@ class State:
             for i,f in enumerate(Action.FEATURE_NAMES):
                 print '\t%+.4f\t%s%+.4f * %+.4f' % (phi[i]*theta[i], f.ljust(30), phi[i], theta[i])
 
-
-        print phi
         return np.dot(phi, theta)
 
     def get_action_probs(self, actions, theta):

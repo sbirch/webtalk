@@ -7,13 +7,12 @@ import copy
 from data import gen_docs
 from scipy.spatial import distance
 
-ITERATIONS = 50
-
 # takes in a list of lists of commands which should be executed in order
-def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=False):
+def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=False, ITERATIONS=50):
     theta = np.zeros(len(web.Action.FEATURE_NAMES))
+
     for i in range(len(web.Action.FEATURE_NAMES)):
-        theta[i] = random.random() / 100
+        theta[i] = (((random.random() * 2) - 1) / 1000)
 
     theta_history = [copy.copy(theta)]
     reward_history = []
@@ -58,7 +57,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
                     rewarder.update_reward(state, action)
 
-                    print "Performing... %r for %r" % (action, cmd)
+                    #print "Performing... %r for %r" % (action, cmd)
                     action.perform(driver, dry=False)
 
                     state_actions.append((
@@ -89,7 +88,6 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
                 theta = np.add(theta, np.multiply(r, gradient))
                 theta_history.append(copy.copy(theta))
-                print theta
                 if len(theta_history) > 1:
                     avg_dist += distance.euclidean(theta, theta_history[-2]) / len(command_documents)
             print "Avg_dist:" , avg_dist
