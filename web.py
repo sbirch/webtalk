@@ -67,7 +67,7 @@ class Action:
             ''', self.element)
 
         if dry and self.type=='click':
-            seutil.highlight(driver, self.element, opacity=0.5)
+            self.highlight(driver)
             return
 
         if self.type == 'click':
@@ -75,6 +75,9 @@ class Action:
         elif self.type == 'type':
             self.element.clear()
             self.element.send_keys(text_classification.untokenize_subcommand(self.params))
+
+    def highlight(self, driver, opacity=0.5):
+        seutil.highlight(driver, self.element, opacity=opacity)
 
     def as_numeric_vector(self):
         return tuple([
@@ -207,9 +210,11 @@ def extend_and_norm_feature(element, feature, command, num_elems):
     #feature['sibling_text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['sibling_text_words'])
 
     feature['tagname_edit'] = str_util.get_mean_distance_of_words(command, [feature['tagname']])
-    feature['text_words_edit'] = str_util.get_mean_distance_of_words(command, feature['text_words'])
-    feature['sibling_text_words_edit'] = str_util.get_mean_distance_of_words(command, feature['sibling_text_words'])
+    #feature['text_words_edit'] = str_util.get_mean_distance_of_words(command, feature['text_words'])
+    #feature['sibling_text_words_edit'] = str_util.get_mean_distance_of_words(command, feature['sibling_text_words'])
 
+    feature['text_words_edit'] = str_util.new_dist(command, feature['text_words'])
+    feature['sibling_text_words_edit'] = str_util.new_dist(command, feature['sibling_text_words'])
 
     feature['n_children'] = 1 - float(feature['n_children']) / num_elems
 

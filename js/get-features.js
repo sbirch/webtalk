@@ -73,6 +73,12 @@ function minEditDistanceForWord(word, word_set) {
 	return minDist;
 }
 
+function tokenize(raw_string){
+  return _.filter(raw_string.replace(/[^a-zA-Z0-9'-]+/g, '|').split('|'), function(w){
+    return w.length > 0;
+  });
+}
+
 var Features = {
   // Returns true if the given element is visible or else false
   // Adapted from https://www.altamiracorp.com/blog/employee-posts/selenium-mojo-a-faster-isvisib
@@ -104,10 +110,30 @@ var Features = {
 
   // return a list of filtered words from the text of an element
   getTextWords: function(elem) {
-	var words = []
-	if (elem.value && this.isClickable(elem)) words.push(elem.value);
-	if (elem.alt) words.push(elem.alt);
-    return filter_word_list(elem.textContent.replace(/[^a-z A-Z]+/g, '').split(/\s+/).concat(words));
+    if (elem.tagName.toLowerCase() == 'script'){return [];}
+
+  	var words = [];
+    // input w/ type button have their labels in value
+  	if (elem.value && this.isClickable(elem)){
+      words.push(elem.value);
+    }
+    if (elem.alt){ words = words.concat(tokenize(elem.alt)); }
+
+    if (elem.placeholder && this.isTypable(elem)){
+      words = words.concat(tokenize(elem.placeholder));
+    }
+
+    if (elem.id){
+      var labels = document.querySelectorAll('label[for="' + elem.id + '"]');
+      _.each(labels, function(lbl){
+        words = words.concat(Features.getTextWords(lbl))
+      });
+    }
+    
+    // This is a (fast) approximation of the above function being called recursively.
+    // It seems OK, however, because the element-specific info should be less relvant
+    // to parent elements.
+    return words.concat(tokenize(elem.textContent));
   },
 
   // produces a list of filtered words in text 
@@ -116,7 +142,7 @@ var Features = {
 	  if (element.parentNode) {
 		  return Features.getTextWords(element.parentNode);
 	  } else {
-		  return ["farts"];
+		  return [];
 	  }
   },
 
@@ -217,6 +243,7 @@ function elementTree(){
 }
 
 res = getAllElementFeatures()
+
 
 return [
   res,
