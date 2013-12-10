@@ -86,7 +86,7 @@ var Features = {
     }
 
     // if 0 x 0 return false
-    if (element.clientWidth === 0 || element.clientHeight === 0){
+    if (element.offsetWidth === 0 || element.offsetHeight === 0){
       return false;
     }
 
