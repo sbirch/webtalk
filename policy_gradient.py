@@ -114,7 +114,7 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
 
 class Rewarder:
-    def __init__(self, correct, perfect=1, ok=0.8, bad=-1):
+    def __init__(self, correct, perfect=1, ok=0.6, bad=-1):
         self.reward_history = []
         self.correct = correct
         self.perfect = perfect
@@ -136,22 +136,15 @@ class Rewarder:
             right_type = a_type == gold_type
             right_element = a_element == gold_wtid
 
-            #print "Gold text " ,gold_text
-            #print "a_text ", a_text
-
             if right_type and right_element:
                 reward += self.ok
 
                 if gold_text and a_text:
-                    text_rightness = float(len(set(gold_text).intersection(set(a_text)))) / max(len(gold_text), len(a_text))
-                    #print text_rightness
-
-
+                    longer_text = max(len(gold_text), len(a_text))
+                    text_rightness = float(len(set(gold_text).intersection(set(a_text)))) / longer_text
                     reward += (self.perfect - self.ok)  * text_rightness
                 elif not gold_text and not a_text:
                     reward += self.perfect - self.ok
-            elif right_type:
-                reward += .25
             else:
                 reward += self.bad
 
