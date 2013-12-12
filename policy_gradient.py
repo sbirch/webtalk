@@ -8,7 +8,7 @@ from data import gen_docs
 from scipy.spatial import distance
 
 # takes in a list of lists of commands which should be executed in order
-def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=False, ITERATIONS=50):
+def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=False, verbose=False, ITERATIONS=50):
     theta = np.zeros(len(web.Action.FEATURE_NAMES))
 
     for i in range(len(web.Action.FEATURE_NAMES)):
@@ -53,11 +53,13 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                             action = a
                             break
 
-                    state.phi_dot_theta(action, theta, verbose=True)
+                    if verbose:
+                        state.phi_dot_theta(action, theta, verbose=True)
 
                     rewarder.update_reward(state, action)
 
-                    #print "Performing... %r for %r" % (action, cmd)
+                    if verbose:
+                        print "Performing... %r for %r" % (action, cmd)
                     action.perform(driver, dry=False)
 
                     state_actions.append((
@@ -82,7 +84,8 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
                 # STEP 5
                 r = rewarder.get_reward() #reward_gold_standard(state_actions, document)
-                print "Reward:", r
+                if verbose:
+                    print "Reward:", r
 
                 reward_history.append(r)
 
@@ -90,9 +93,11 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                 theta_history.append(copy.copy(theta))
                 if len(theta_history) > 1:
                     avg_dist += distance.euclidean(theta, theta_history[-2]) / len(command_documents)
-            print "Avg_dist:" , avg_dist
+            if verbose:
+                print "Avg_dist:" , avg_dist
             if avg_dist < .1:
-                print "Theta is not changing much in the latest iteration, breaking"
+                if verbose:
+                    print "Theta is not changing much in the latest iteration, breaking"
                 break
     finally:
         driver.quit()
@@ -153,40 +158,6 @@ class Rewarder:
         return reward*1.0 / len(self.reward_history)
 
 
-
-def reward_branavan(history):
-    sentence_rewards = []
-
-    for state, action, best_score in history:
-        # did the action make sense for state?
-        # we assess by seeing if any word in the command appeared in the element we chose.
-        chosen_element_words = action.features['text_words']
-        if str_util.get_min_distance_for_words(state.command, chosen_element_words) == 0:
-            sentence_rewards.append(best_score)
-        else:
-            return -1
-
-    return sum(sentence_rewards)*1.0 / len(sentence_rewards)
-
-def reward(history):
-    #last_state, last_action, last_best_score = history[-1]
-    #classes = set(last_action.element.get_attribute("class").split())
-
-    #search_classes = set(["submit front-box-search-button m-flight m-active"])
-
-
-    #return len(classes.intersection(search_classes))
-    return random.randint(0,10)
-
 if __name__ == "__main__":
-    docs = gen_docs.get_all_docs()
-    for i in range(1):
-        res = policy_gradient(docs)
-        print "Result theta:", res
-        print
-
-
-
-
-
-
+    docs = gen_docs.get_all_docs("data/sendacard_corpus.tsv")[:25]
+    print "Theta:", policy_gradient(docs)

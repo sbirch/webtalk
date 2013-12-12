@@ -46,7 +46,7 @@ class Action:
         #'double_subword',
         #'big_subword',
         #'contains_action_word',
-        #contains_stop_word',
+        #'contains_stop_word',
         #'contains_element_word',
         #'contains_element_sib_word',
         #'word_entropy',
@@ -122,7 +122,6 @@ class State:
     def phi_dot_theta(self, action, theta, verbose=False):
         phi = action.as_numeric_vector()
 
-
         if verbose:
             print u'Product (%.4f, \u03d5 * \u03b8):' % np.dot(phi, theta)
             for i,f in enumerate(Action.FEATURE_NAMES):
@@ -161,7 +160,6 @@ def start(url, headless=False):
     driver.get(url)
     return driver
 
-
 ELEMENT_DATA = json.load(open('element_sizes.json', 'rb'))
 
 BUTTON_SIZE_KDE = stats.gaussian_kde(np.transpose(np.array(
@@ -188,15 +186,14 @@ BLACKBOX = text_classification.build_default_model()
 def extend_subword_features(feature, subwords, command):
     if subwords is None:
         feature['text_blackbox'] = 0
-        feature['contains_element_sib_word'] = 0
+        #feature['contains_element_sib_word'] = 0
         return feature
 
-    action_words = 'press hit click type enter put'.split(' ')
-    stop_words = 'the in as for to'.split(' ')
-    bad_words = feature['sibling_text_words'] + stop_words + action_words
+    #action_words = 'press hit click type enter put'.split(' ')
+    #stop_words = 'the in as for to'.split(' ')
+    #bad_words = feature['sibling_text_words'] + stop_words + action_words
     #feature['contains_element_word'] = 1 - (sum([w.lower() in feature['text_words']+action_words+stop_words for w in subwords]) / float(max(len(feature['text_words']),len(subwords))))
-    feature['contains_element_sib_word'] = 1 - (sum([w.lower() in bad_words for w in subwords]) / float(max(len(bad_words),len(subwords))))
-    #feature['contains_element_sib_word'] = 1 if any([w.lower() in feature['sibling_text_words'] for w in subwords]) else -1
+    #feature['contains_element_sib_word'] = 1 - (sum([w.lower() in bad_words for w in subwords]) / float(max(len(bad_words),len(subwords))))
 
     feature['text_blackbox'] = BLACKBOX(subwords)
 
@@ -205,16 +202,12 @@ def extend_subword_features(feature, subwords, command):
 def extend_and_norm_feature(element, feature, command, num_elems):
     feature['element'] = element
 
-    #feature['tagname_edit'] = str_util.get_normed_dist_for_words(command, [feature['tagname']])
-    #feature['text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['text_words'])
-    #feature['sibling_text_words_edit'] = str_util.get_normed_dist_for_words(command, feature['sibling_text_words'])
-
     feature['tagname_edit'] = str_util.get_mean_distance_of_words(command, [feature['tagname']])
-    #feature['text_words_edit'] = str_util.get_mean_distance_of_words(command, feature['text_words'])
-    #feature['sibling_text_words_edit'] = str_util.get_mean_distance_of_words(command, feature['sibling_text_words'])
 
-    feature['text_words_edit'] = str_util.new_dist(command, feature['text_words'])
-    feature['sibling_text_words_edit'] = str_util.new_dist(command, feature['sibling_text_words'])
+    # alt. str_util.get_normed_dist_for_words or str_util.get_mean_distance_of_words
+    distance = str_util.new_dist
+    feature['text_words_edit'] = distance(command, feature['text_words'])
+    feature['sibling_text_words_edit'] = distance(command, feature['sibling_text_words'])
 
     feature['n_children'] = 1 - float(feature['n_children']) / num_elems
 
@@ -234,11 +227,12 @@ def extend_and_norm_feature(element, feature, command, num_elems):
     feature['relative_x'] = np.arctan(1 * (feature['relative_x'] + 0.5)) / (np.pi / 2)
     feature['relative_y'] = np.arctan(1 * feature['relative_y']) / (np.pi / 2)
 
-    # new on page?
-    # position (relative to last action?)
-    # color
-    # relative tab index
-    # text specificity
+    # Feature ideas:
+        # new on page?
+        # position (relative to last action?)
+        # color
+        # relative tab index
+        # text specificity
     return feature
 
 def extract(driver, command):

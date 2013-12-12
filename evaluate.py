@@ -52,6 +52,7 @@ def evaluate(eval_corpus_file, theta, start_url):
 def eval_round(i, docs):
     print 'Training %d' % i
     theta = policy_gradient.policy_gradient(docs)
+    print 'Theta:', theta
     print 'Evaluating %d' % i
     doc_pct, cmd_pct = evaluate("data/sendacard_mturk_corpus.tsv", theta, "http://localhost:8000")
     print i, "Doc Pct: " , doc_pct , " Cmd Pct: " , cmd_pct
