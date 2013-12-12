@@ -36,3 +36,43 @@
 6	Click the Submit button	click	submit	None
 6	Click Submit	click	submit	None
 5	Make sure the card tab is clicked and hit submit.	click	submit	None
+1	Type the name John into the box next to first name.	type	firstname	John
+1	Type John into the first name field.	type	firstname	John
+1	Type John into the First name box.	type	firstname	John
+1	Type john in the First Name box.	type	firstname	John
+1	Type John in the First name box.	type	firstname	John
+2	Type Smith into the Last name box.	type	lastname	Smith
+2	Type the name Smith into the box after last name.	type	lastname	Smith
+2	Type Smith into the Last name field.	type	lastname	Smith
+2	Type Smith in the Last Name box.	type	lastname	Smith
+2	type smith in the last name box	type	lastname	Smith
+3	Type the number 6237 in the box after the word mailbox.	type	mailbox	6237
+3	Type 6237 in the Mailbox box.	type	mailbox	6237
+3	Enter 6237 into the Mailbox field.	type	mailbox	6237
+3	Enter 6237 in the Mailbox field.	type	mailbox	6237
+3	Type 6237 in the Mailbox field.	type	mailbox	6237
+4	Click Continue.	click	continue	None
+4	Click on the continue button.	click	continue	None
+4	Click on the continue button.	click	continue	None
+4	Click the Continue button.	click	continue	None
+4	Click on the Continue button.	click	continue	None
+5	Click on the little dot next to the word Chocolates.	click	chocolates	None
+5	Click the circle for Chocolates.	click	chocolates	None
+5	Select Chocolates.	click	chocolates	None
+5	Click the button next to Chocolates.	click	chocolates	None
+5	Click on the button after the word chocolates.	click	chocolates	None
+5	Click on the circle for Card.	click	card	None
+5	Click the button next to Card.	click	card	None
+5	Select Card.	click	card	None
+5	Click on the button after the word card.	click	card	None
+5	Click the little dot next to the word card.	click	card	None
+5	Click on the button next to flowers.	click	flowers	None
+5	Click on the little dot next to the word Flowers.	click	flowers	None
+5	Click on the circle for Flowers.	click	flowers	None
+5	Click the circular button next to Flowers.	click	flowers	None
+5	Click on Flowers.	click	flowers	None
+6	Click the submit button.	click	submit	None
+6	Click the Submit button.	click	submit	None
+6	Hit Submit.	click	submit	None
+6	Click on the submit button.	click	submit	None
+6	Click on the submit button.	click	submit	None
