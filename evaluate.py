@@ -49,6 +49,16 @@ def evaluate(eval_corpus_file, theta, start_url):
 
     return float(correct_docs) / len(docs), float(correct_cmds) / total_cmds
 
+def eval_round(i):
+    print 'Training %d' % i
+    theta = policy_gradient.policy_gradient(docs)
+    print 'Evaluating %d' % i
+    doc_pct, cmd_pct = evaluate("data/sendacard_mturk_corpus.tsv", theta, "http://localhost:8000")
+    print i, "Doc Pct: " , doc_pct , " Cmd Pct: " , cmd_pct
+
+    return doc_pct, cmd_pct
+
+
 if __name__ == "__main__":
     # generated this one friday dec 6
 
@@ -58,17 +68,15 @@ if __name__ == "__main__":
     random.shuffle(docs)
     docs = docs[:25]
 
+    ROUNDS = int(sys.argv[1])
+    print 'Doing %d rounds' % ROUNDS
+
     avg_doc_pct, avg_cmd_pct = 0,0
-    for i in range(int(sys.argv[1])):
-        theta = policy_gradient.policy_gradient(docs)
 
-        doc_pct, cmd_pct = evaluate("data/sendacard_mturk_corpus.tsv", theta, "http://localhost:8000")
+    results = [eval_round(i) for i in range(ROUNDS)]
 
-        print "Doc Pct: " , doc_pct , " Cmd Pct: " , cmd_pct
+    print '\a\a\a'
 
-        avg_doc_pct += doc_pct / float(5)
-        avg_cmd_pct += cmd_pct / float(5)
-
-    print "Avg doc pct: ", avg_doc_pct , " Avg cmd pct: ", avg_cmd_pct
+    print "Avg doc pct: ", sum([doc_pct/ROUNDS for doc_pct,cmd_pct in results]), " Avg cmd pct: ", sum([cmd_pct/ROUNDS for doc_pct,cmd_pct in results])
 
 
