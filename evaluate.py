@@ -49,7 +49,7 @@ def evaluate(eval_corpus_file, theta, start_url):
 
     return float(correct_docs) / len(docs), float(correct_cmds) / total_cmds
 
-def eval_round(i):
+def eval_round(i, docs):
     print 'Training %d' % i
     theta = policy_gradient.policy_gradient(docs)
     print 'Evaluating %d' % i
@@ -60,20 +60,16 @@ def eval_round(i):
 
 
 if __name__ == "__main__":
-    # generated this one friday dec 6
-
-    # Doc Pct:  0.37  Cmd Pct:  0.89
-    #theta = [7.4246, 1.6352, 7.2982, -2.9867, 5.4484, 2.0682, -0.0010, 0.8105, 5.0358, 6.9543]
     docs = gen_docs.get_all_docs("data/sendacard_corpus.tsv")
     random.shuffle(docs)
-    docs = docs[:25]
+    docs = docs[:40]
 
     ROUNDS = int(sys.argv[1])
     print 'Doing %d rounds' % ROUNDS
 
     avg_doc_pct, avg_cmd_pct = 0,0
 
-    results = [eval_round(i) for i in range(ROUNDS)]
+    results = [eval_round(i, docs) for i in range(ROUNDS)]
 
     print '\a\a\a'
 
