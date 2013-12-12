@@ -46,20 +46,20 @@ def evaluate(eval_corpus_file, theta, start_url):
         if doc_correct:
             correct_docs += 1
 
-
+    driver.quit()
     return float(correct_docs) / len(docs), float(correct_cmds) / total_cmds
 
 def eval_round(i, docs):
     print 'Training %d' % i
     theta = policy_gradient.policy_gradient(docs)
-    print 'Theta:', theta
+    print 'Theta:', list(theta)
     print 'Evaluating %d' % i
     doc_pct, cmd_pct = evaluate("data/sendacard_mturk_corpus.tsv", theta, "http://localhost:8000")
     print i, "Doc Pct: " , doc_pct , " Cmd Pct: " , cmd_pct
 
     return doc_pct, cmd_pct
 
-
+ 
 if __name__ == "__main__":
     docs = gen_docs.get_all_docs("data/sendacard_corpus.tsv")
     random.shuffle(docs)

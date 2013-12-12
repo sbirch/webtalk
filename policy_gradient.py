@@ -4,6 +4,7 @@ import random
 import time
 import util.str_util as str_util
 import copy
+import sys
 from data import gen_docs
 from scipy.spatial import distance
 
@@ -85,7 +86,8 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                 # STEP 5
                 r = rewarder.get_reward() #reward_gold_standard(state_actions, document)
                 if verbose:
-                    print "Reward:", r
+                    # \x1b[2K\x1b[0G ?
+                    print "Reward: %r" % r
 
                 reward_history.append(r)
 
