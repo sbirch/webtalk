@@ -39,3 +39,13 @@ Click on the link
 [On gmail]
 Go to the left bar
 Click “CS132”
+
+Requires:
+ntlk 
+python-Levenstein
+chrome-driver
+selenium
+numpy
+scipy
+scikit-learn
+(optional) matplotlib
