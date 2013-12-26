@@ -7,7 +7,6 @@ from data import gen_docs
 
 
 if False: # train a new vector
-<<<<<<< HEAD
     docs = gen_docs.get_all_docs("data/sendacard_corpus.tsv")
     random.shuffle(docs)
     docs = docs[:25]
