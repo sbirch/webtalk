@@ -1,10 +1,12 @@
 from collections import defaultdict
+import sys
+import argparse
 
 # dict from sequence number to a tuple with command and a second tuple with its
 # semantic representation
 def get_all_docs(cmds_file):
     commands = defaultdict(list)
-    for l in open(cmds_file):
+    for l in cmds_file:
         split_line = l.split("\t")
 
         n = int(split_line[0])
@@ -35,6 +37,20 @@ def get_all_docs(cmds_file):
 
     rec_gendocs()
     return all_docs
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Train webtalk to generate a parameter vector")
+
+    parser.add_argument("corpus_file", type=file, help="A tsv of plain commands with order annotations")
+    parser.add_argument("num_docs", type=int, help="A number documents to randomly generate off of the corpus file")
+
+    args = parser.parse_args()
+
+    for doc in get_all_docs(args.corpus_file)[:args.num_docs]:
+        for command in doc:
+            txt_cmd, (cmd_type, target, arg) = command
+            print str(txt_cmd) + "\t" + str(cmd_type) + "\t" + str(target) + "\t" + str(arg)
+        print
 
 
 
