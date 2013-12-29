@@ -65,8 +65,8 @@ def parse_docs_file(docs_file):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train webtalk to generate a parameter vector")
 
-    parser.add_argument("corpus_file", type=file, help="A tsv of plain commands with order annotations")
     parser.add_argument("num_docs", type=int, help="A number documents to randomly generate off of the corpus file")
+    parser.add_argument("corpus_file", default=sys.stdin,type=file, help="A tsv of plain commands with order annotations", nargs="?")
 
     args = parser.parse_args()
     for doc in get_all_docs(args.corpus_file)[:args.num_docs]:
