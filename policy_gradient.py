@@ -154,6 +154,6 @@ class Rewarder:
 
 
 if __name__ == "__main__":
-    docs = gen_docs.get_all_docs("data/sendacard_corpus.tsv")[:25]
+    docs = gen_docs.get_all_docs("data/corpora/sendacard_corpus.tsv")[:25]
     print "Theta:", policy_gradient(docs, visualize=True, verbose=True)
 

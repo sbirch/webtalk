@@ -3,7 +3,7 @@ from nltk.tokenize import word_tokenize
 from collections import Counter
 from sklearn import svm
 
-#from nltk.tag import pos_tag  
+#from nltk.tag import pos_tag
 #import stanford_parser_pipe
 #print stanford_parser_pipe.parse('Type John in the First Name field')
 #sys.exit(0)
@@ -55,8 +55,8 @@ def build_idf_model(corpus):
     return evalmodel
 
 # A list of documents (lists of words)
-CORPUS = [x[1] for x in csv.reader(open('data/sendacard_corpus.tsv', 'rb'), delimiter='\t')]
-CORPUS += [x[1] for x in csv.reader(open('data/hipmunk_corpus.tsv', 'rb'), delimiter='\t')]
+CORPUS = [x[1] for x in csv.reader(open('data/corpora/sendacard_corpus.tsv', 'rb'), delimiter='\t')]
+CORPUS += [x[1] for x in csv.reader(open('data/corpora/hipmunk_corpus.tsv', 'rb'), delimiter='\t')]
 
 UNIGRAM_MODEL = build_unigram_model(CORPUS)
 IDF_MODEL = build_idf_model(CORPUS)
@@ -77,7 +77,7 @@ def feats(subwords, command, start, end):
 
     tf_idf = sum([IDF_MODEL(w) for w in subwords]) / len(subwords)
 
-    
+
     #tags = [(word, tag) for word, tag in pos_tag(command)][start:end]
     #taglist = [tag for word, tag in tags]
 
@@ -117,7 +117,7 @@ def build_model(train):
     return clf
 
 def build_default_model():
-    model = build_model(read_data('data/sendacard_corpus.tsv'))
+    model = build_model(read_data('data/corpora/sendacard_corpus.tsv'))
 
     def evalmodel(subwords):
         v = model.decision_function(feats(subwords, None, None, None))[0]
@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
     total_correct = 0
 
-    test = read_data('data/sendacard_mturk_corpus.tsv')
+    test = read_data('data/corpora/sendacard_mturk_corpus.tsv')
 
     for sentence, correct in test:
         print sentence, '=>', correct

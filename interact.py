@@ -1,26 +1,26 @@
 import numpy as np
+import argparse
 import web
 import policy_gradient
 import random
 import readline
 from data import gen_docs
+import sys
 
 
-if False: # train a new vector
-    docs = gen_docs.get_all_docs("data/sendacard_corpus.tsv")
-    random.shuffle(docs)
-    docs = docs[:25]
-    theta = policy_gradient.policy_gradient(docs)
-else:
-    # Daedalus vector
-    #theta = [+4.3172, +3.3282, +3.8092, -2.6218, +7.9710, +4.0238, -0.0002, +1.3441, +5.7676, +7.4365]
-    # Best of eval
-    theta = [4.1303645925709178, 2.4226422308579605, 5.3969554359870386, -3.1853219158721493, 6.6798106812814826, 3.1624395829369849, 0.00021545227788204581, 1.1430678550057314, 5.3933282823027868, 7.4415914266213221]
+parser = argparse.ArgumentParser(description="Launch an interactive web talk session attached to Chrome")
+
+parser.add_argument("theta_file", type=file, help="A file containing a theta vector in the text output format of numpy, pass as an argument or pipe in through stdin", default=sys.stdin, nargs='?')
+
+args = parser.parse_args()
+
+theta = np.loadtxt(args.theta_file)
 
 try:
     driver = web.start("http://localhost:8000")
 
     cmd = ""
+    sys.stdin = open('/dev/tty')
     while cmd != "QUIT":
         cmd = raw_input('> ')
         state = web.build_state(driver, web.tokenize_command(cmd))
