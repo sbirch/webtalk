@@ -5,11 +5,13 @@ import time
 import util.str_util as str_util
 import copy
 import sys
+import config
+import logging
 from data import gen_docs
 from scipy.spatial import distance
 
 # takes in a list of lists of commands which should be executed in order
-def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=False, verbose=False, ITERATIONS=50):
+def policy_gradient(command_documents, start_url = "http://localhost:8000", visualize=False, ITERATIONS=50):
     theta = np.zeros(len(web.Action.FEATURE_NAMES))
 
     for i in range(len(web.Action.FEATURE_NAMES)):
@@ -54,13 +56,11 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                             action = a
                             break
 
-                    if verbose:
-                        state.phi_dot_theta(action, theta, verbose=True)
+                    logging.debug(state.phi_dot_theta_str(action, theta))
 
                     rewarder.update_reward(state, action)
 
-                    if verbose:
-                        print "Performing... %r for %r" % (action, cmd)
+                    logging.debug("Performing... %s for %s",action, cmd)
                     action.perform(driver, dry=False)
 
                     state_actions.append((
@@ -85,9 +85,8 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
 
                 # STEP 5
                 r = rewarder.get_reward() #reward_gold_standard(state_actions, document)
-                if verbose:
-                    # \x1b[2K\x1b[0G ?
-                    print "Reward: %r" % r
+
+                logging.info("Reward: %d",r)
 
                 reward_history.append(r)
 
@@ -95,11 +94,9 @@ def policy_gradient(command_documents, start_url = "http://localhost:8000", visu
                 theta_history.append(copy.copy(theta))
                 if len(theta_history) > 1:
                     avg_dist += distance.euclidean(theta, theta_history[-2]) / len(command_documents)
-            if verbose:
-                print "Avg_dist:" , avg_dist
+            logging.info("Avg_dist: %f", avg_dist)
             if avg_dist < .1:
-                if verbose:
-                    print "Theta is not changing much in the latest iteration, breaking"
+                logging.info("Theta is not changing much in the latest iteration, breaking")
                 break
     finally:
         driver.quit()
@@ -155,5 +152,5 @@ class Rewarder:
 
 if __name__ == "__main__":
     docs = gen_docs.get_all_docs("data/corpora/sendacard_corpus.tsv")[:25]
-    print "Theta:", policy_gradient(docs, visualize=True, verbose=True)
+    print "Theta:", policy_gradient(docs, visualize=True)
 

@@ -118,14 +118,17 @@ class State:
                 _el = extend_subword_features(_el, None, self.command)
                 actions.append(Action(_el['element'], 'click', _el))
         return actions
-
-    def phi_dot_theta(self, action, theta, verbose=False):
+    def phi_dot_theta_str(self, action, theta):
         phi = action.as_numeric_vector()
 
-        if verbose:
-            print u'Product (%.4f, \u03d5 * \u03b8):' % np.dot(phi, theta)
-            for i,f in enumerate(Action.FEATURE_NAMES):
-                print '\t%+.4f\t%s%+.4f * %+.4f' % (phi[i]*theta[i], f.ljust(30), phi[i], theta[i])
+        res = u'Product (%.4f, \u03d5 * \u03b8):\n' % np.dot(phi, theta)
+        for i,f in enumerate(Action.FEATURE_NAMES):
+            res += '\t%+.4f\t%s%+.4f * %+.4f\n' % (phi[i]*theta[i], f.ljust(30), phi[i], theta[i])
+
+        return res
+
+    def phi_dot_theta(self, action, theta):
+        phi = action.as_numeric_vector()
 
         return np.dot(phi, theta)
 

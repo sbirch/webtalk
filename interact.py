@@ -31,12 +31,12 @@ try:
 
         print "Performing... ", action
         print "With prob: ", probs[action]
-        state.phi_dot_theta(action, theta, True)
+        print state.phi_dot_theta_str(action, theta)
 
         if False:
             correct = [a for a in actions if a.type == 'click' and a.element.get_attribute('x-wtid') == 'continue' and a.params is None][0]
             print 'Correct action was:', correct
-            state.phi_dot_theta(correct, theta, True)
+            print state.phi_dot_theta_str(correct, theta)
 
         action.perform(driver, dry=False)
 finally:
